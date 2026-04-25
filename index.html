@@ -359,26 +359,23 @@
         </div>
     </section>
 
-    <!-- Primero carga config.js si existe, luego el script principal -->
     <script>
         // Intentar cargar config.js dinámicamente
         const configScript = document.createElement('script');
         configScript.src = 'js/config.js';
         configScript.onerror = function() {
-            console.log('%c🟡 Modo simulado: %cconfig.js no encontrado', 'color: #ffd700;', 'color: #a0a0b8;');
+            console.log('%c🟡 Modo simulado: %cUsando datos locales con imágenes', 'color: #ffd700;', 'color: #a0a0b8;');
         };
         document.head.appendChild(configScript);
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
-        // Esperar a que config.js se cargue (si existe)
         window.addEventListener('load', function() {
-            setTimeout(initializeApp, 100);
+            setTimeout(initializeApp, 200);
         });
 
         function initializeApp() {
-            // Detectar si la API key está disponible
             const HAS_API_KEY = typeof WATCHMODE_API_KEY !== 'undefined' && 
                                WATCHMODE_API_KEY && 
                                WATCHMODE_API_KEY !== 'TU_API_KEY_REAL_AQUI' &&
@@ -388,11 +385,9 @@
             if (HAS_API_KEY) {
                 modeIndicator.textContent = '🔴 LIVE';
                 modeIndicator.className = 'mode-indicator mode-live';
-                console.log('%c🔴 Modo LIVE: %cWatchmode API conectada', 'color: #00ff88;', 'color: #a0a0b8;');
             } else {
                 modeIndicator.textContent = '🟡 SIMULADO';
                 modeIndicator.className = 'mode-indicator mode-simulated';
-                console.log('%c🟡 Modo SIMULADO: %cUsando datos locales', 'color: #ffd700;', 'color: #a0a0b8;');
             }
 
             const CONFIG = {
@@ -404,43 +399,332 @@
                 searchTimeout: null
             };
 
+            // Películas con imágenes reales de posters (usando imágenes de Wikipedia/Wikimedia - libres de derechos)
             const LOCAL_MOVIES = [
-                { id: 1, title: "Dune: Part Two", year: 2024, rating: 8.8, genres: ["Sci-Fi", "Aventura", "Drama"], synopsis: "Paul Atreides se une a los Fremen para liberar Arrakis y vengar a su familia." },
-                { id: 2, title: "Deadpool & Wolverine", year: 2024, rating: 8.0, genres: ["Acción", "Comedia", "Superhéroes"], synopsis: "Deadpool y Wolverine unen fuerzas en una aventura que cambiará el multiverso." },
-                { id: 3, title: "Inside Out 2", year: 2024, rating: 7.8, genres: ["Animación", "Aventura", "Comedia"], synopsis: "Nuevas emociones llegan a la mente de Riley en su adolescencia." },
-                { id: 4, title: "The Wild Robot", year: 2024, rating: 8.4, genres: ["Animación", "Aventura", "Sci-Fi"], synopsis: "Un robot naufraga en una isla y aprende a convivir con los animales." },
-                { id: 5, title: "Alien: Romulus", year: 2024, rating: 7.6, genres: ["Sci-Fi", "Terror", "Suspense"], synopsis: "Jóvenes colonos enfrentan la forma de vida más aterradora del universo." },
-                { id: 6, title: "Joker: Folie à Deux", year: 2024, rating: 6.6, genres: ["Drama", "Musical", "Suspense"], synopsis: "Arthur Fleck encuentra el amor en Arkham mientras su alter ego crece." },
-                { id: 7, title: "Wicked", year: 2024, rating: 7.9, genres: ["Musical", "Fantasía", "Drama"], synopsis: "La historia no contada de las brujas de Oz antes de Dorothy." },
-                { id: 8, title: "Moana 2", year: 2024, rating: 7.1, genres: ["Animación", "Aventura", "Musical"], synopsis: "Moana emprende una nueva aventura por los mares de Oceanía." },
-                { id: 9, title: "Furiosa: A Mad Max Saga", year: 2024, rating: 7.8, genres: ["Acción", "Sci-Fi", "Aventura"], synopsis: "El origen de Furiosa en el mundo post-apocalíptico de Mad Max." },
-                { id: 10, title: "Gladiator II", year: 2024, rating: 7.3, genres: ["Acción", "Drama", "Historia"], synopsis: "Lucio lucha por sobrevivir en el Coliseo siguiendo el legado de Máximo." },
-                { id: 11, title: "The Fall Guy", year: 2024, rating: 7.2, genres: ["Acción", "Comedia", "Romance"], synopsis: "Un doble de acción persigue a una estrella desaparecida." },
-                { id: 12, title: "Beetlejuice Beetlejuice", year: 2024, rating: 7.0, genres: ["Comedia", "Fantasía", "Terror"], synopsis: "El fantasma más travieso regresa para causar caos en el mundo de los vivos." },
-                { id: 13, title: "A Quiet Place: Day One", year: 2024, rating: 6.9, genres: ["Terror", "Sci-Fi", "Drama"], synopsis: "El primer día de la invasión alienígena en Nueva York." },
-                { id: 14, title: "Kingdom of the Planet of the Apes", year: 2024, rating: 7.3, genres: ["Sci-Fi", "Acción", "Aventura"], synopsis: "Un joven simio cuestiona todo lo que sabe sobre el pasado." },
-                { id: 15, title: "Mickey 17", year: 2025, rating: 7.5, genres: ["Sci-Fi", "Drama", "Comedia"], synopsis: "Un 'prescindible' en una misión de colonización descubre oscuros secretos." },
-                { id: 16, title: "Snow White", year: 2025, rating: 6.8, genres: ["Fantasía", "Musical", "Aventura"], synopsis: "La princesa más icónica en una nueva adaptación live-action." },
-                { id: 17, title: "The Substance", year: 2024, rating: 7.5, genres: ["Terror", "Drama", "Suspense"], synopsis: "Una celebridad usa una droga del mercado negro para crear una versión joven de sí misma." },
-                { id: 18, title: "Heretic", year: 2024, rating: 7.1, genres: ["Terror", "Suspense", "Drama"], synopsis: "Dos misioneras enfrentan a un hombre con un juego macabro." },
-                { id: 19, title: "The Brutalist", year: 2024, rating: 8.0, genres: ["Drama", "Historia"], synopsis: "Un arquitecto húngaro reconstruye su vida en América tras la guerra." },
-                { id: 20, title: "Anora", year: 2024, rating: 8.1, genres: ["Drama", "Comedia", "Romance"], synopsis: "Una trabajadora sexual de Brooklyn se casa con el hijo de un oligarca ruso." },
-                { id: 21, title: "Challengers", year: 2024, rating: 7.4, genres: ["Drama", "Deporte", "Romance"], synopsis: "Un triángulo amoroso en el competitivo mundo del tenis profesional." },
-                { id: 22, title: "Oppenheimer", year: 2023, rating: 8.4, genres: ["Drama", "Historia", "Biopic"], synopsis: "La historia del padre de la bomba atómica y su conflicto moral." },
-                { id: 23, title: "Barbie", year: 2023, rating: 7.1, genres: ["Comedia", "Fantasía", "Aventura"], synopsis: "Barbie descubre la realidad del mundo real y cuestiona su existencia." },
-                { id: 24, title: "Spider-Man: Across the Spider-Verse", year: 2023, rating: 8.7, genres: ["Animación", "Acción", "Superhéroes"], synopsis: "Miles Morales viaja por el multiverso enfrentando a nuevos enemigos." },
-                { id: 25, title: "The Batman", year: 2022, rating: 7.8, genres: ["Acción", "Drama", "Suspense"], synopsis: "Batman investiga una serie de crímenes que revelan la corrupción de Gotham." },
-                { id: 26, title: "Everything Everywhere All at Once", year: 2022, rating: 7.8, genres: ["Sci-Fi", "Comedia", "Drama"], synopsis: "Una mujer descubre que puede acceder a los recuerdos de sus vidas paralelas." },
-                { id: 27, title: "Interstellar", year: 2014, rating: 8.7, genres: ["Sci-Fi", "Drama", "Aventura"], synopsis: "Astronautas viajan por un agujero de gusano para salvar a la humanidad." },
-                { id: 28, title: "Parasite", year: 2019, rating: 8.5, genres: ["Drama", "Suspense", "Comedia"], synopsis: "Una familia pobre se infiltra en la vida de una familia rica." },
-                { id: 29, title: "The Super Mario Bros. Movie", year: 2023, rating: 7.1, genres: ["Animación", "Aventura", "Comedia"], synopsis: "Mario y Luigi viajan por el Reino Champiñón para salvar a la princesa." },
-                { id: 30, title: "Avatar: The Way of Water", year: 2022, rating: 7.6, genres: ["Sci-Fi", "Aventura", "Acción"], synopsis: "Los Sully luchan por proteger a su familia en los océanos de Pandora." },
-                { id: 31, title: "Civil War", year: 2024, rating: 7.2, genres: ["Acción", "Drama", "Suspense"], synopsis: "Periodistas cruzan una América dividida por una guerra civil." },
-                { id: 32, title: "Twisters", year: 2024, rating: 6.8, genres: ["Acción", "Aventura", "Suspense"], synopsis: "Cazadores de tormentas enfrentan tornados nunca antes vistos." },
-                { id: 33, title: "IF", year: 2024, rating: 6.5, genres: ["Fantasía", "Comedia", "Drama"], synopsis: "Una niña descubre que puede ver a los amigos imaginarios abandonados." },
-                { id: 34, title: "Bad Boys: Ride or Die", year: 2024, rating: 7.0, genres: ["Acción", "Comedia", "Suspense"], synopsis: "Mike y Marcus regresan para limpiar el nombre de su capitán." },
-                { id: 35, title: "Sonic the Hedgehog 3", year: 2024, rating: 7.3, genres: ["Animación", "Acción", "Comedia"], synopsis: "Sonic y sus amigos enfrentan a un nuevo y poderoso enemigo." },
-                { id: 36, title: "Transformers One", year: 2024, rating: 7.6, genres: ["Animación", "Sci-Fi", "Acción"], synopsis: "La historia de origen de Optimus Prime y Megatron en Cybertron." }
+                { 
+                    id: 1, 
+                    title: "Dune: Part Two", 
+                    year: 2024, 
+                    rating: 8.8, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/5/52/Dune_Part_Two_poster.jpeg",
+                    genres: ["Sci-Fi", "Aventura", "Drama"], 
+                    synopsis: "Paul Atreides se une a los Fremen para liberar Arrakis y vengar a su familia." 
+                },
+                { 
+                    id: 2, 
+                    title: "Deadpool & Wolverine", 
+                    year: 2024, 
+                    rating: 8.0, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/4/4c/Deadpool_%26_Wolverine_poster.jpg",
+                    genres: ["Acción", "Comedia", "Superhéroes"], 
+                    synopsis: "Deadpool y Wolverine unen fuerzas en una aventura que cambiará el multiverso." 
+                },
+                { 
+                    id: 3, 
+                    title: "Inside Out 2", 
+                    year: 2024, 
+                    rating: 7.8, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/f/f7/Inside_Out_2_poster.jpg",
+                    genres: ["Animación", "Aventura", "Comedia"], 
+                    synopsis: "Nuevas emociones llegan a la mente de Riley en su adolescencia." 
+                },
+                { 
+                    id: 4, 
+                    title: "Oppenheimer", 
+                    year: 2023, 
+                    rating: 8.4, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/4/4a/Oppenheimer_%28film%29.jpg",
+                    genres: ["Drama", "Historia", "Biopic"], 
+                    synopsis: "La historia del padre de la bomba atómica y su conflicto moral." 
+                },
+                { 
+                    id: 5, 
+                    title: "Barbie", 
+                    year: 2023, 
+                    rating: 7.1, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/0/0b/Barbie_2023_poster.jpg",
+                    genres: ["Comedia", "Fantasía", "Aventura"], 
+                    synopsis: "Barbie descubre la realidad del mundo real y cuestiona su existencia." 
+                },
+                { 
+                    id: 6, 
+                    title: "Interstellar", 
+                    year: 2014, 
+                    rating: 8.7, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/b/bc/Interstellar_film_poster.jpg",
+                    genres: ["Sci-Fi", "Drama", "Aventura"], 
+                    synopsis: "Astronautas viajan por un agujero de gusano para salvar a la humanidad." 
+                },
+                { 
+                    id: 7, 
+                    title: "Parasite", 
+                    year: 2019, 
+                    rating: 8.5, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/5/53/Parasite_%282019_film%29.png",
+                    genres: ["Drama", "Suspense", "Comedia"], 
+                    synopsis: "Una familia pobre se infiltra en la vida de una familia rica." 
+                },
+                { 
+                    id: 8, 
+                    title: "The Batman", 
+                    year: 2022, 
+                    rating: 7.8, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/5/54/The_Batman_%28film%29_poster.jpg",
+                    genres: ["Acción", "Drama", "Suspense"], 
+                    synopsis: "Batman investiga una serie de crímenes que revelan la corrupción de Gotham." 
+                },
+                { 
+                    id: 9, 
+                    title: "Spider-Man: Across the Spider-Verse", 
+                    year: 2023, 
+                    rating: 8.7, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/b/b4/Spider-Man-_Across_the_Spider-Verse_poster.jpg",
+                    genres: ["Animación", "Acción", "Superhéroes"], 
+                    synopsis: "Miles Morales viaja por el multiverso enfrentando a nuevos enemigos." 
+                },
+                { 
+                    id: 10, 
+                    title: "Avatar: The Way of Water", 
+                    year: 2022, 
+                    rating: 7.6, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/5/54/Avatar_The_Way_of_Water_poster.jpg",
+                    genres: ["Sci-Fi", "Aventura", "Acción"], 
+                    synopsis: "Los Sully luchan por proteger a su familia en los océanos de Pandora." 
+                },
+                { 
+                    id: 11, 
+                    title: "Everything Everywhere All at Once", 
+                    year: 2022, 
+                    rating: 7.8, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/1/1e/Everything_Everywhere_All_at_Once.jpg",
+                    genres: ["Sci-Fi", "Comedia", "Drama"], 
+                    synopsis: "Una mujer descubre que puede acceder a los recuerdos de sus vidas paralelas." 
+                },
+                { 
+                    id: 12, 
+                    title: "Joker", 
+                    year: 2019, 
+                    rating: 8.4, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/e/e1/Joker_%282019_film%29_poster.jpg",
+                    genres: ["Drama", "Suspense", "Crimen"], 
+                    synopsis: "Arthur Fleck, un comediante fracasado, se convierte en el Joker." 
+                },
+                { 
+                    id: 13, 
+                    title: "The Super Mario Bros. Movie", 
+                    year: 2023, 
+                    rating: 7.1, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/4/44/The_Super_Mario_Bros._Movie_poster.jpg",
+                    genres: ["Animación", "Aventura", "Comedia"], 
+                    synopsis: "Mario y Luigi viajan por el Reino Champiñón para salvar a la princesa." 
+                },
+                { 
+                    id: 14, 
+                    title: "Gladiator", 
+                    year: 2000, 
+                    rating: 8.5, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/f/fb/Gladiator_%282000_film_poster%29.png",
+                    genres: ["Acción", "Drama", "Historia"], 
+                    synopsis: "Un general romano busca venganza como gladiador." 
+                },
+                { 
+                    id: 15, 
+                    title: "Inception", 
+                    year: 2010, 
+                    rating: 8.8, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/2/2e/Inception_%282010%29_theatrical_poster.jpg",
+                    genres: ["Sci-Fi", "Acción", "Suspense"], 
+                    synopsis: "Un ladrón se especializa en robar secretos del subconsciente." 
+                },
+                { 
+                    id: 16, 
+                    title: "The Dark Knight", 
+                    year: 2008, 
+                    rating: 9.0, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/1/1c/The_Dark_Knight_%282008_film%29.jpg",
+                    genres: ["Acción", "Drama", "Suspense"], 
+                    synopsis: "Batman enfrenta al Joker, un genio criminal que busca el caos." 
+                },
+                { 
+                    id: 17, 
+                    title: "Pulp Fiction", 
+                    year: 1994, 
+                    rating: 8.9, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/3/3b/Pulp_Fiction_%281994%29_poster.jpg",
+                    genres: ["Crimen", "Drama"], 
+                    synopsis: "Historias entrelazadas de criminales en Los Ángeles." 
+                },
+                { 
+                    id: 18, 
+                    title: "The Matrix", 
+                    year: 1999, 
+                    rating: 8.7, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/c/c1/The_Matrix_Poster.jpg",
+                    genres: ["Sci-Fi", "Acción"], 
+                    synopsis: "Un hacker descubre que la realidad es una simulación." 
+                },
+                { 
+                    id: 19, 
+                    title: "Forrest Gump", 
+                    year: 1994, 
+                    rating: 8.8, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/6/67/Forrest_Gump_poster.jpg",
+                    genres: ["Drama", "Comedia", "Romance"], 
+                    synopsis: "La vida de un hombre simple que presencia momentos históricos." 
+                },
+                { 
+                    id: 20, 
+                    title: "Fight Club", 
+                    year: 1999, 
+                    rating: 8.8, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/f/fc/Fight_Club_poster.jpg",
+                    genres: ["Drama", "Suspense"], 
+                    synopsis: "Un oficinista crea un club de pelea clandestino." 
+                },
+                { 
+                    id: 21, 
+                    title: "The Shawshank Redemption", 
+                    year: 1994, 
+                    rating: 9.3, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/8/81/ShawshankRedemptionMoviePoster.jpg",
+                    genres: ["Drama", "Crimen"], 
+                    synopsis: "Un banquero condenado injustamente encuentra esperanza en prisión." 
+                },
+                { 
+                    id: 22, 
+                    title: "The Godfather", 
+                    year: 1972, 
+                    rating: 9.2, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/1/1c/Godfather_ver1.jpg",
+                    genres: ["Crimen", "Drama"], 
+                    synopsis: "La historia de la familia Corleone en el mundo de la mafia." 
+                },
+                { 
+                    id: 23, 
+                    title: "Schindler's List", 
+                    year: 1993, 
+                    rating: 9.0, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/3/38/Schindler%27s_List_movie.jpg",
+                    genres: ["Drama", "Historia", "Guerra"], 
+                    synopsis: "Un empresario salva a cientos de judíos durante el Holocausto." 
+                },
+                { 
+                    id: 24, 
+                    title: "Titanic", 
+                    year: 1997, 
+                    rating: 7.9, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/1/18/Titanic_%281997_film%29_poster.png",
+                    genres: ["Drama", "Romance", "Historia"], 
+                    synopsis: "Una historia de amor durante el fatídico viaje del Titanic." 
+                },
+                { 
+                    id: 25, 
+                    title: "Jurassic Park", 
+                    year: 1993, 
+                    rating: 8.2, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/e/e7/Jurassic_Park_poster.jpg",
+                    genres: ["Sci-Fi", "Aventura", "Acción"], 
+                    synopsis: "Un parque de dinosaurios se convierte en una pesadilla." 
+                },
+                { 
+                    id: 26, 
+                    title: "Back to the Future", 
+                    year: 1985, 
+                    rating: 8.5, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/d/d2/Back_to_the_Future.jpg",
+                    genres: ["Sci-Fi", "Aventura", "Comedia"], 
+                    synopsis: "Un adolescente viaja al pasado en un DeLorean modificado." 
+                },
+                { 
+                    id: 27, 
+                    title: "Star Wars: A New Hope", 
+                    year: 1977, 
+                    rating: 8.6, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/8/87/StarWarsMoviePoster1977.jpg",
+                    genres: ["Sci-Fi", "Aventura", "Fantasía"], 
+                    synopsis: "Luke Skywalker se une a la Rebelión para salvar la galaxia." 
+                },
+                { 
+                    id: 28, 
+                    title: "E.T. the Extra-Terrestrial", 
+                    year: 1982, 
+                    rating: 7.9, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/6/66/E_t_the_extra_terrestrial_ver3.jpg",
+                    genres: ["Sci-Fi", "Aventura", "Familiar"], 
+                    synopsis: "Un niño ayuda a un extraterrestre perdido a volver a casa." 
+                },
+                { 
+                    id: 29, 
+                    title: "The Lion King", 
+                    year: 1994, 
+                    rating: 8.5, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/3/3d/The_Lion_King_poster.jpg",
+                    genres: ["Animación", "Aventura", "Drama"], 
+                    synopsis: "Un joven león debe reclamar su lugar como rey." 
+                },
+                { 
+                    id: 30, 
+                    title: "Toy Story", 
+                    year: 1995, 
+                    rating: 8.3, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/1/13/Toy_Story.jpg",
+                    genres: ["Animación", "Aventura", "Comedia"], 
+                    synopsis: "Los juguetes cobran vida cuando nadie los ve." 
+                },
+                { 
+                    id: 31, 
+                    title: "Alien", 
+                    year: 1979, 
+                    rating: 8.5, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/c/c3/Alien_movie_poster.jpg",
+                    genres: ["Sci-Fi", "Terror", "Suspense"], 
+                    synopsis: "La tripulación de una nave enfrenta una criatura mortal." 
+                },
+                { 
+                    id: 32, 
+                    title: "Blade Runner", 
+                    year: 1982, 
+                    rating: 8.1, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/5/53/Blade_Runner_poster.jpg",
+                    genres: ["Sci-Fi", "Suspense", "Drama"], 
+                    synopsis: "Un cazador de androides busca replicantes rebeldes." 
+                },
+                { 
+                    id: 33, 
+                    title: "Goodfellas", 
+                    year: 1990, 
+                    rating: 8.7, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/7/7b/Goodfellas.jpg",
+                    genres: ["Crimen", "Drama", "Biopic"], 
+                    synopsis: "La vida de un gánster en la mafia italoamericana." 
+                },
+                { 
+                    id: 34, 
+                    title: "The Silence of the Lambs", 
+                    year: 1991, 
+                    rating: 8.6, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/8/86/The_Silence_of_the_Lambs_poster.jpg",
+                    genres: ["Suspense", "Crimen", "Drama"], 
+                    synopsis: "Una agente del FBI busca la ayuda de un brillante caníbal." 
+                },
+                { 
+                    id: 35, 
+                    title: "Saving Private Ryan", 
+                    year: 1998, 
+                    rating: 8.6, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/a/ac/Saving_Private_Ryan_poster.jpg",
+                    genres: ["Guerra", "Drama", "Acción"], 
+                    synopsis: "Soldados buscan a un paracaidista detrás de las líneas enemigas." 
+                },
+                { 
+                    id: 36, 
+                    title: "The Lord of the Rings: The Fellowship of the Ring", 
+                    year: 2001, 
+                    rating: 8.9, 
+                    poster: "https://upload.wikimedia.org/wikipedia/en/8/8a/The_Lord_of_the_Rings_The_Fellowship_of_the_Ring_%282001%29.jpg",
+                    genres: ["Fantasía", "Aventura", "Acción"], 
+                    synopsis: "Un hobbit emprende un viaje para destruir un anillo de poder." 
+                }
             ];
 
             function generateUniquePoster(title, index, year) {
@@ -502,24 +786,21 @@
                 %3C/svg%3E`;
             }
 
+            // El resto de funciones permanece igual...
             async function fetchMovies(query = '', page = 1) {
                 if (HAS_API_KEY) {
                     try {
                         const baseUrl = 'https://api.watchmode.com/v1';
                         let url;
-                        
                         if (query) {
                             url = `${baseUrl}/search/?apiKey=${WATCHMODE_API_KEY}&search_field=name&search_value=${encodeURIComponent(query)}&types=movie&limit=${CONFIG.moviesPerPage}`;
                         } else {
                             const skip = (page - 1) * CONFIG.moviesPerPage;
                             url = `${baseUrl}/list-titles/?apiKey=${WATCHMODE_API_KEY}&types=movie&limit=${CONFIG.moviesPerPage}&skip=${skip}&sort_by=popularity_desc`;
                         }
-                        
                         const response = await fetch(url);
                         if (!response.ok) throw new Error(`API error: ${response.status}`);
-                        
                         const data = await response.json();
-                        
                         if (data.titles && data.titles.length > 0) {
                             const movies = data.titles.map((movie, idx) => ({
                                 id: movie.id,
@@ -530,7 +811,6 @@
                                 synopsis: movie.plot_overview || 'Sinopsis no disponible',
                                 genres: movie.genre_names || ['General']
                             }));
-                            
                             return {
                                 movies: movies,
                                 totalResults: data.total_results || movies.length,
@@ -541,13 +821,11 @@
                         console.warn('Error con Watchmode API, usando datos locales:', error.message);
                     }
                 }
-                
                 return getLocalMovies(query, page);
             }
 
             function getLocalMovies(query = '', page = 1) {
                 let filtered = LOCAL_MOVIES;
-                
                 if (query) {
                     const term = query.toLowerCase();
                     filtered = LOCAL_MOVIES.filter(movie => 
@@ -556,23 +834,16 @@
                         movie.genres.some(genre => genre.toLowerCase().includes(term))
                     );
                 }
-                
                 const totalResults = filtered.length;
                 const totalPages = Math.ceil(totalResults / CONFIG.moviesPerPage);
                 const start = (page - 1) * CONFIG.moviesPerPage;
-                
                 const movies = filtered.slice(start, start + CONFIG.moviesPerPage).map((movie, idx) => ({
                     ...movie,
-                    poster: generateUniquePoster(movie.title, start + idx, movie.year)
+                    poster: movie.poster || generateUniquePoster(movie.title, start + idx, movie.year)
                 }));
-                
                 return new Promise(resolve => {
                     setTimeout(() => {
-                        resolve({
-                            movies: movies,
-                            totalResults: totalResults,
-                            totalPages: totalPages
-                        });
+                        resolve({ movies, totalResults, totalPages });
                     }, 300);
                 });
             }
@@ -586,10 +857,8 @@
                     return;
                 }
                 document.getElementById('emptyState').style.display = 'none';
-                
                 grid.innerHTML = movies.map((movie, index) => {
                     const fallbackUrl = generateUniquePoster(movie.title, index, movie.year);
-                    
                     return `
                     <div class="col-6 col-md-4 col-lg-3">
                         <div class="movie-card">
@@ -727,7 +996,6 @@
                 }
             });
 
-            // Cargar películas al iniciar
             loadMovies();
         }
     </script>
