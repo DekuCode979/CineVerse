@@ -307,7 +307,7 @@
             <div class="d-flex justify-content-between align-items-center">
                 <a class="navbar-brand" href="#">
                     <i class="fas fa-film"></i> CineVerse
-                    <span class="mode-indicator" id="modeIndicator">Cargando...</span>
+                    <span class="mode-indicator" id="modeIndicator">🟡 Simulado</span>
                 </a>
                 <div class="d-flex align-items-center gap-3">
                     <div class="search-container d-flex align-items-center">
@@ -359,29 +359,12 @@
         </div>
     </section>
 
-    <!-- Cargar configuración de API -->
-    <script src="js/config.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <script>
         // ============================================
-        // CONFIGURACIÓN DE WATCHMODE API
+        // CONFIGURACIÓN
         // ============================================
-        // La variable WATCHMODE_API_KEY se carga desde js/config.js
-        
-        const HAS_API_KEY = typeof WATCHMODE_API_KEY !== 'undefined' && 
-                           WATCHMODE_API_KEY && 
-                           WATCHMODE_API_KEY !== 'TU_API_KEY_REAL_AQUI';
-        
-        const modeIndicator = document.getElementById('modeIndicator');
-        if (HAS_API_KEY) {
-            modeIndicator.textContent = '🔴 LIVE';
-            modeIndicator.className = 'mode-indicator mode-live';
-        } else {
-            modeIndicator.textContent = '🟡 SIMULADO';
-            modeIndicator.className = 'mode-indicator mode-simulated';
-        }
-
         const CONFIG = {
             moviesPerPage: 12,
             currentPage: 1,
@@ -392,7 +375,7 @@
         };
 
         // ============================================
-        // BASE DE DATOS LOCAL DE PELÍCULAS (36 películas únicas)
+        // BASE DE DATOS LOCAL DE PELÍCULAS (36 únicas)
         // ============================================
         const LOCAL_MOVIES = [
             { id: 1, title: "Dune: Part Two", year: 2024, rating: 8.8, genres: ["Sci-Fi", "Aventura", "Drama"], synopsis: "Paul Atreides se une a los Fremen para liberar Arrakis y vengar a su familia." },
@@ -498,49 +481,6 @@
         // ============================================
         // FUNCIONES PRINCIPALES
         // ============================================
-        async function fetchMovies(query = '', page = 1) {
-            if (HAS_API_KEY) {
-                try {
-                    const baseUrl = 'https://api.watchmode.com/v1';
-                    let url;
-                    
-                    if (query) {
-                        url = `${baseUrl}/search/?apiKey=${WATCHMODE_API_KEY}&search_field=name&search_value=${encodeURIComponent(query)}&types=movie&limit=${CONFIG.moviesPerPage}`;
-                    } else {
-                        const skip = (page - 1) * CONFIG.moviesPerPage;
-                        url = `${baseUrl}/list-titles/?apiKey=${WATCHMODE_API_KEY}&types=movie&limit=${CONFIG.moviesPerPage}&skip=${skip}&sort_by=popularity_desc`;
-                    }
-                    
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error(`API error: ${response.status}`);
-                    
-                    const data = await response.json();
-                    
-                    if (data.titles && data.titles.length > 0) {
-                        const movies = data.titles.map((movie, idx) => ({
-                            id: movie.id,
-                            title: movie.title,
-                            year: movie.year || new Date().getFullYear(),
-                            rating: (Math.random() * 3 + 5).toFixed(1),
-                            poster: movie.poster || generateUniquePoster(movie.title, idx, movie.year),
-                            synopsis: movie.plot_overview || 'Sinopsis no disponible',
-                            genres: movie.genre_names || ['General']
-                        }));
-                        
-                        return {
-                            movies: movies,
-                            totalResults: data.total_results || movies.length,
-                            totalPages: Math.ceil((data.total_results || movies.length) / CONFIG.moviesPerPage)
-                        };
-                    }
-                } catch (error) {
-                    console.warn('Error con Watchmode API, usando datos locales:', error.message);
-                }
-            }
-            
-            return getLocalMovies(query, page);
-        }
-
         function getLocalMovies(query = '', page = 1) {
             let filtered = LOCAL_MOVIES;
             
@@ -675,7 +615,7 @@
         async function loadMovies(query = '', page = 1) {
             showLoading();
             try {
-                const data = await fetchMovies(query, page);
+                const data = await getLocalMovies(query, page);
                 hideLoading();
                 renderMovieCards(data.movies);
                 CONFIG.totalPages = data.totalPages;
@@ -724,9 +664,8 @@
                     toggleSearch();
                 }
             });
-            console.log('%c🎬 CineVerse %cInicializado con pósters únicos (Watchmode API)',
-                'color: #e94560; font-size: 1.2rem;', 
-                `color: ${HAS_API_KEY ? '#00ff88' : '#ffd700'};`);
+            console.log('%c🎬 CineVerse %cInicializado con 36 películas únicas',
+                'color: #e94560; font-size: 1.2rem;', 'color: #ffd700;');
         });
     </script>
 </body>
