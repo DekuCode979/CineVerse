@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* ... MISMOS ESTILOS QUE YA TIENES ... */
         :root {
             --bg-primary: #0f0f1a;
             --bg-secondary: #1a1a2e;
@@ -43,6 +42,9 @@
             border-bottom: 1px solid var(--border);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
             padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .navbar-brand {
@@ -190,7 +192,6 @@
             color: var(--text-primary);
             line-height: 1.3;
             display: -webkit-box;
-            -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
             line-clamp: 2;
             overflow: hidden;
@@ -203,7 +204,6 @@
             line-height: 1.5;
             flex: 1;
             display: -webkit-box;
-            -webkit-box-orient: vertical;
             -webkit-line-clamp: 3;
             line-clamp: 3;
             overflow: hidden;
@@ -302,7 +302,7 @@
     </style>
 </head>
 <body>
-    <nav class="navbar-custom sticky-top">
+    <nav class="navbar-custom">
         <div class="container">
             <div class="d-flex justify-content-between align-items-center">
                 <a class="navbar-brand" href="#">
@@ -360,14 +360,12 @@
     </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/config.js"></script>
     
     <script>
-        // ============================================
-        // DETECCIÓN AUTOMÁTICA DE API KEY
-        // ============================================
-        const HAS_API_KEY = typeof WATCHMODE_API_KEY !== 'undefined' && 
-                           WATCHMODE_API_KEY !== 'TU_API_KEY_REAL_AQUI';
+        // Configuración de API Key para OMDb (gratuita)
+        const OMDB_API_KEY = 'TU_API_KEY_DE_OMDB'; // Reemplaza con tu API key de http://www.omdbapi.com/
+        
+        const HAS_API_KEY = OMDB_API_KEY && OMDB_API_KEY !== 'TU_API_KEY_DE_OMDB';
         
         const modeIndicator = document.getElementById('modeIndicator');
         if (HAS_API_KEY) {
@@ -387,121 +385,188 @@
             searchTimeout: null
         };
 
+        // Lista de películas populares para buscar en OMDb (sin repetir)
+        const POPULAR_MOVIES = [
+            "Dune Part Two", "Deadpool and Wolverine", "Inside Out 2", "The Wild Robot",
+            "Alien Romulus", "Joker Folie a Deux", "Wicked", "Moana 2",
+            "Furiosa Mad Max", "Gladiator II", "The Fall Guy", "Beetlejuice Beetlejuice",
+            "A Quiet Place Day One", "Kingdom of the Planet of the Apes", "Mickey 17",
+            "Snow White 2025", "The Substance", "Heretic", "The Brutalist", "Anora",
+            "Challengers", "Oppenheimer", "Barbie 2023", "Spider-Man Across the Spider-Verse",
+            "The Batman", "Everything Everywhere All at Once", "Interstellar", "Parasite",
+            "Super Mario Bros", "Avatar The Way of Water", "Civil War 2024", "Twisters 2024",
+            "IF", "Bad Boys Ride or Die", "Sonic the Hedgehog 3", "Transformers One"
+        ];
 
-// ============================================
-// PÓSTERS VERIFICADOS - 36 PELÍCULAS (2024-2025)
-// ============================================
-const FALLBACK_MOVIES = [
-    { id: 1, title: "Dune: Part Two", year: 2024, rating: 8.8, poster: "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg" },
-    { id: 2, title: "Deadpool & Wolverine", year: 2024, rating: 8.0, poster: "https://image.tmdb.org/t/p/w500/4JeejGugONWpJkbnvLrK2NkMZcB.jpg" },
-    { id: 3, title: "Inside Out 2", year: 2024, rating: 7.8, poster: "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg" },
-    { id: 4, title: "The Wild Robot", year: 2024, rating: 8.4, poster: "https://image.tmdb.org/t/p/w500/wTnV3PCVW5O92JMrFvvrXcV9OXo.jpg" },
-    { id: 5, title: "Alien: Romulus", year: 2024, rating: 7.6, poster: "https://image.tmdb.org/t/p/w500/b33nnKl1GSFbao4l3fZDFqsMux1.jpg" },
-    { id: 6, title: "Joker: Folie à Deux", year: 2024, rating: 6.6, poster: "https://image.tmdb.org/t/p/w500/if8QiqCI7hy7M2SY5YXGDjeK1i0.jpg" },
-    { id: 7, title: "Wicked", year: 2024, rating: 7.9, poster: "https://image.tmdb.org/t/p/w500/xDGbZ0JJ3mYaGKy4Nzd9Kph6M9L.jpg" },
-    { id: 8, title: "Moana 2", year: 2024, rating: 7.1, poster: "https://image.tmdb.org/t/p/w500/a0eIyL7NeLh7hFfZ8Iq8QbIy0Cb.jpg" },
-    { id: 9, title: "Furiosa", year: 2024, rating: 7.8, poster: "https://image.tmdb.org/t/p/w500/iADOJ8Zymht2JPMoy3R7xceZpr3.jpg" },
-    { id: 10, title: "Gladiator II", year: 2024, rating: 7.3, poster: "https://image.tmdb.org/t/p/w500/2cxhv0moE7LHH4xH0dRl7B9QMEX.jpg" },
-    { id: 11, title: "The Fall Guy", year: 2024, rating: 7.2, poster: "https://image.tmdb.org/t/p/w500/a2oUkUgMowYHD6J8JwJqMq3Ycnn.jpg" },
-    { id: 12, title: "Beetlejuice 2", year: 2024, rating: 7.0, poster: "https://image.tmdb.org/t/p/w500/2Zpp4t7M2yg3YTJxTX9BG4hCsMW.jpg" },
-    { id: 13, title: "A Quiet Place: Day One", year: 2024, rating: 6.9, poster: "https://image.tmdb.org/t/p/w500/hU42CRk14JuCKEdn7MN6R5xGJZI.jpg" },
-    { id: 14, title: "Planet of the Apes", year: 2024, rating: 7.3, poster: "https://image.tmdb.org/t/p/w500/gKkl3zI4KZK0GmvJmpsaFysNSUK.jpg" },
-    { id: 15, title: "Mickey 17", year: 2025, rating: 7.5, poster: "https://image.tmdb.org/t/p/w500/3Nc3YqLfJ7hWg5FGMhGHhFBVxEN.jpg" },
+        // Géneros para películas sin API
+        const GENRE_MAP = {
+            "Dune Part Two": ["Sci-Fi", "Aventura"],
+            "Deadpool and Wolverine": ["Acción", "Comedia"],
+            "Inside Out 2": ["Animación", "Aventura"],
+            "The Wild Robot": ["Animación", "Sci-Fi"],
+            "Alien Romulus": ["Sci-Fi", "Terror"],
+            "Joker Folie a Deux": ["Drama", "Musical"],
+            "Wicked": ["Musical", "Fantasía"],
+            "Moana 2": ["Animación", "Aventura"],
+            "Furiosa Mad Max": ["Acción", "Sci-Fi"],
+            "Gladiator II": ["Acción", "Drama"],
+            "The Fall Guy": ["Acción", "Comedia"],
+            "Beetlejuice Beetlejuice": ["Comedia", "Fantasía"],
+            "A Quiet Place Day One": ["Terror", "Sci-Fi"],
+            "Kingdom of the Planet of the Apes": ["Sci-Fi", "Acción"],
+            "Mickey 17": ["Sci-Fi", "Drama"],
+            "Snow White 2025": ["Fantasía", "Musical"],
+            "The Substance": ["Terror", "Drama"],
+            "Heretic": ["Terror", "Suspense"],
+            "The Brutalist": ["Drama", "Historia"],
+            "Anora": ["Drama", "Comedia"],
+            "Challengers": ["Drama", "Deporte"],
+            "Oppenheimer": ["Drama", "Historia"],
+            "Barbie 2023": ["Comedia", "Fantasía"],
+            "Spider-Man Across the Spider-Verse": ["Animación", "Acción"],
+            "The Batman": ["Acción", "Drama"],
+            "Everything Everywhere All at Once": ["Sci-Fi", "Comedia"],
+            "Interstellar": ["Sci-Fi", "Drama"],
+            "Parasite": ["Drama", "Suspense"],
+            "Super Mario Bros": ["Animación", "Aventura"],
+            "Avatar The Way of Water": ["Sci-Fi", "Aventura"],
+            "Civil War 2024": ["Acción", "Drama"],
+            "Twisters 2024": ["Acción", "Aventura"],
+            "IF": ["Fantasía", "Comedia"],
+            "Bad Boys Ride or Die": ["Acción", "Comedia"],
+            "Sonic the Hedgehog 3": ["Animación", "Acción"],
+            "Transformers One": ["Animación", "Sci-Fi"]
+        };
 
-    { id: 16, title: "Snow White", year: 2025, rating: 6.8, poster: "https://image.tmdb.org/t/p/w500/oJ9ot8SQ6k1lFv8VQ9p9h9NP7VD.jpg" },
-    { id: 17, title: "The Substance", year: 2024, rating: 7.5, poster: "https://image.tmdb.org/t/p/w500/lqoMzCcZYEFK729d6qzt9a2wEwB.jpg" },
-    { id: 18, title: "Heretic", year: 2024, rating: 7.1, poster: "https://image.tmdb.org/t/p/w500/5gTXUMGqV9Jgx0F9K6yHGQ4pCWw.jpg" },
-
-    { id: 19, title: "The Brutalist", year: 2024, rating: 8.0, poster: "https://image.tmdb.org/t/p/w500/9O1Iy9od7Gz9W6xjKp0gQ0zW0cJ.jpg" },
-    { id: 20, title: "Anora", year: 2024, rating: 8.1, poster: "https://image.tmdb.org/t/p/w500/5N9j9FQzYt1xwK0nYQvGvH3tP6k.jpg" },
-
-    { id: 21, title: "Challengers", year: 2024, rating: 7.4, poster: "https://image.tmdb.org/t/p/w500/4i8K5ZvI0QzW6x3NH8URQF0bXBz.jpg" },
-    { id: 22, title: "Oppenheimer", year: 2023, rating: 8.4, poster: "https://image.tmdb.org/t/p/w500/ptpr0kGAckfQkJeJIt8st5dglvd.jpg" },
-
-    { id: 23, title: "Barbie", year: 2023, rating: 7.1, poster: "https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg" },
-    { id: 24, title: "Spider-Verse", year: 2023, rating: 8.7, poster: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg" },
-    { id: 25, title: "The Batman", year: 2022, rating: 7.8, poster: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg" },
-    { id: 26, title: "Everything Everywhere", year: 2022, rating: 7.8, poster: "https://image.tmdb.org/t/p/w500/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg" },
-    { id: 27, title: "Interstellar", year: 2014, rating: 8.7, poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg" },
-    { id: 28, title: "Parasite", year: 2019, rating: 8.5, poster: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg" },
-    { id: 29, title: "Mario Bros", year: 2023, rating: 7.1, poster: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" },
-    { id: 30, title: "Avatar 2", year: 2022, rating: 7.6, poster: "https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg" },
-    { id: 31, title: "Civil War", year: 2024, rating: 7.2, poster: "https://image.tmdb.org/t/p/w500/sh7RgKErRVyMjMNgKRWnGn6zBz.jpg" },
-    { id: 32, title: "Twisters", year: 2024, rating: 6.8, poster: "https://image.tmdb.org/t/p/w500/pjnD08FlMAIXsfOLKQbvmO0f0MD.jpg" },
-    { id: 33, title: "IF", year: 2024, rating: 6.5, poster: "https://image.tmdb.org/t/p/w500/xbKFv4KF3sVYuWKllLlwWDmuZP7.jpg" },
-    { id: 34, title: "Bad Boys 4", year: 2024, rating: 7.0, poster: "https://image.tmdb.org/t/p/w500/oGythE98MYleE6mNp3hTuA5b1Jw.jpg" },
-    { id: 35, title: "Sonic 3", year: 2024, rating: 7.3, poster: "https://image.tmdb.org/t/p/w500/d8Ryb8AunYAuycVKDp5HpdWPKgC.jpg" },
-    { id: 36, title: "Transformers One", year: 2024, rating: 7.6, poster: "https://image.tmdb.org/t/p/w500/qbkAiqDQFQlbAR0OJNwDNimOJXu.jpg" }
-];
-        // ============================================
-        // FUNCIÓN DE FALLBACK DE IMÁGENES MEJORADA
-        // ============================================
-        function getFallbackPosterUrl(title) {
-            // SVG inline como placeholder (siempre funciona)
-            const encodedTitle = encodeURIComponent(title.substring(0, 20));
-            return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='450'%3E%3Cdefs%3E%3ClinearGradient id='grad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' style='stop-color:%2316213e;stop-opacity:1'/%3E%3Cstop offset='100%25' style='stop-color:%230a0a1a;stop-opacity:1'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect fill='url(%23grad)' width='300' height='450' rx='8'/%3E%3Ctext fill='%23e94560' font-family='Arial,sans-serif' font-size='48' text-anchor='middle' x='150' y='200'%3E🎬%3C/text%3E%3Ctext fill='%23e0e0f0' font-family='Arial,sans-serif' font-size='14' text-anchor='middle' x='150' y='250'%3E${encodedTitle}%3C/text%3E%3C/svg%3E`;
-        }
-
-        // ============================================
-        // FUNCIONES PRINCIPALES
-        // ============================================
-        async function fetchMovies(query = '', page = 1) {
-            if (HAS_API_KEY) {
-                try {
-                    const baseUrl = 'https://api.watchmode.com/v1';
-                    let url;
-                    if (query) {
-                        url = `${baseUrl}/search/?apiKey=${WATCHMODE_API_KEY}&search_field=name&search_value=${encodeURIComponent(query)}&types=movie`;
-                    } else {
-                        const skip = (page - 1) * CONFIG.moviesPerPage;
-                        url = `${baseUrl}/list-titles/?apiKey=${WATCHMODE_API_KEY}&types=movie&limit=${CONFIG.moviesPerPage}&skip=${skip}`;
-                    }
-                    const response = await fetch(url);
-                    if (!response.ok) throw new Error(`API error: ${response.status}`);
-                    const data = await response.json();
-                    const movies = (data.titles || []).map(movie => ({
-                        id: movie.id,
-                        title: movie.title,
-                        year: movie.year || new Date().getFullYear(),
-                        rating: (Math.random() * 3 + 5).toFixed(1),
-                        poster: movie.poster || null,
-                        synopsis: movie.plot_overview || 'Sinopsis no disponible',
-                        genres: movie.genre_names || ['General']
-                    }));
+        // Función para buscar película en OMDb
+        async function fetchFromOMDb(title) {
+            if (!HAS_API_KEY) return null;
+            
+            try {
+                const response = await fetch(`https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&t=${encodeURIComponent(title)}`);
+                const data = await response.json();
+                
+                if (data.Response === 'True') {
                     return {
-                        movies: movies,
-                        totalResults: data.total_results || movies.length,
-                        totalPages: Math.ceil((data.total_results || movies.length) / CONFIG.moviesPerPage)
+                        title: data.Title,
+                        year: data.Year,
+                        rating: parseFloat(data.imdbRating) || (Math.random() * 3 + 5).toFixed(1),
+                        poster: data.Poster !== 'N/A' ? data.Poster : null,
+                        synopsis: data.Plot || 'Sinopsis no disponible',
+                        genres: data.Genre ? data.Genre.split(', ') : (GENRE_MAP[title] || ['General'])
                     };
-                } catch (error) {
-                    console.warn('Error con Watchmode API, usando datos de respaldo:', error.message);
                 }
+            } catch (error) {
+                console.warn(`Error fetching ${title} from OMDb:`, error);
             }
-            return getFallbackMovies(query, page);
+            return null;
         }
 
-        function getFallbackMovies(query = '', page = 1) {
-            let filtered = FALLBACK_MOVIES;
-            if (query) {
-                const term = query.toLowerCase();
-                filtered = FALLBACK_MOVIES.filter(movie => 
-                    movie.title.toLowerCase().includes(term) ||
-                    movie.synopsis.toLowerCase().includes(term) ||
-                    movie.genres.some(genre => genre.toLowerCase().includes(term))
-                );
+        // Función para obtener datos de respaldo
+        function getFallbackMovie(title, index) {
+            const year = title.includes("2024") ? "2024" : 
+                        title.includes("2025") ? "2025" : 
+                        title.includes("2023") ? "2023" : 
+                        title.includes("2022") ? "2022" : "2021";
+            
+            return {
+                title: title,
+                year: year,
+                rating: (Math.random() * 2 + 6).toFixed(1),
+                poster: null,
+                synopsis: `Una emocionante película de ${title}`,
+                genres: GENRE_MAP[title] || ['General']
+            };
+        }
+
+        // Función para generar poster SVG único por película
+        function getUniquePoster(title, index) {
+            const colors = ['#e94560', '#ff6b81', '#ffd700', '#00ff88', '#00bcd4', '#9c27b0', '#ff5722', '#3f51b5'];
+            const color = colors[index % colors.length];
+            const encodedTitle = encodeURIComponent(title.substring(0, 30));
+            
+            return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='450'%3E
+                %3Cdefs%3E
+                    %3ClinearGradient id='grad${index}' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E
+                        %3Cstop offset='0%25' style='stop-color:%231a1a2e;stop-opacity:1'/%3E
+                        %3Cstop offset='100%25' style='stop-color:%230a0a1a;stop-opacity:1'/%3E
+                    %3C/linearGradient%3E
+                %3C/defs%3E
+                %3Crect fill='url(%23grad${index})' width='300' height='450' rx='12'/%3E
+                %3Ccircle cx='150' cy='150' r='60' fill='${color}' opacity='0.8'/%3E
+                %3Ctext fill='white' font-family='Arial,sans-serif' font-size='48' text-anchor='middle' x='150' y='168'%3E🎬%3C/text%3E
+                %3Ctext fill='%23e0e0f0' font-family='Arial,sans-serif' font-size='16' font-weight='bold' text-anchor='middle' x='150' y='280'%3E${encodedTitle}%3C/text%3E
+                %3Ctext fill='%23a0a0b8' font-family='Arial,sans-serif' font-size='12' text-anchor='middle' x='150' y='310'%3E⭐ ${(Math.random() * 2 + 6).toFixed(1)}%3C/text%3E
+                %3Crect x='40' y='380' width='220' height='3' rx='1.5' fill='${color}' opacity='0.5'/%3E
+            %3C/svg%3E`;
+        }
+
+        // Función principal para cargar películas
+        async function fetchMovies(query = '', page = 1) {
+            let movies = [];
+            
+            if (query && HAS_API_KEY) {
+                // Búsqueda en OMDb
+                try {
+                    const response = await fetch(`https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&s=${encodeURIComponent(query)}&type=movie`);
+                    const data = await response.json();
+                    
+                    if (data.Response === 'True') {
+                        const searchResults = data.Search.slice(0, CONFIG.moviesPerPage);
+                        for (const movie of searchResults) {
+                            const details = await fetchFromOMDb(movie.Title);
+                            if (details) {
+                                movies.push(details);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Error en búsqueda OMDb:', error);
+                }
+            } else if (!query && HAS_API_KEY) {
+                // Cargar películas populares desde OMDb
+                const startIndex = (page - 1) * CONFIG.moviesPerPage;
+                const endIndex = startIndex + CONFIG.moviesPerPage;
+                const batch = POPULAR_MOVIES.slice(startIndex, endIndex);
+                
+                for (const title of batch) {
+                    const movie = await fetchFromOMDb(title);
+                    if (movie) {
+                        movies.push(movie);
+                    } else {
+                        movies.push(getFallbackMovie(title, POPULAR_MOVIES.indexOf(title)));
+                    }
+                }
+            } else {
+                // Modo simulado sin API
+                let filtered = POPULAR_MOVIES;
+                if (query) {
+                    const term = query.toLowerCase();
+                    filtered = POPULAR_MOVIES.filter(title => title.toLowerCase().includes(term));
+                }
+                
+                const startIndex = (page - 1) * CONFIG.moviesPerPage;
+                const batch = filtered.slice(startIndex, startIndex + CONFIG.moviesPerPage);
+                
+                movies = batch.map((title, idx) => ({
+                    ...getFallbackMovie(title, POPULAR_MOVIES.indexOf(title)),
+                    poster: null
+                }));
             }
-            const totalResults = filtered.length;
-            const totalPages = Math.ceil(totalResults / CONFIG.moviesPerPage);
-            const start = (page - 1) * CONFIG.moviesPerPage;
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve({
-                        movies: filtered.slice(start, start + CONFIG.moviesPerPage),
-                        totalResults,
-                        totalPages
-                    });
-                }, 500);
-            });
+            
+            // Asegurar que cada película tenga un poster único
+            movies = movies.map((movie, index) => ({
+                ...movie,
+                poster: movie.poster || getUniquePoster(movie.title, index)
+            }));
+            
+            const totalResults = query ? movies.length : POPULAR_MOVIES.length;
+            
+            return {
+                movies: movies,
+                totalResults: totalResults,
+                totalPages: Math.ceil(totalResults / CONFIG.moviesPerPage)
+            };
         }
 
         function renderMovieCards(movies) {
@@ -514,15 +579,14 @@ const FALLBACK_MOVIES = [
             }
             document.getElementById('emptyState').style.display = 'none';
             
-            grid.innerHTML = movies.map(movie => {
-                const posterUrl = movie.poster || getFallbackPosterUrl(movie.title);
-                const fallbackUrl = getFallbackPosterUrl(movie.title);
+            grid.innerHTML = movies.map((movie, index) => {
+                const fallbackUrl = getUniquePoster(movie.title, index);
                 
                 return `
                 <div class="col-6 col-md-4 col-lg-3">
                     <div class="movie-card">
                         <div class="movie-poster">
-                            <img src="${posterUrl}" 
+                            <img src="${movie.poster}" 
                                  alt="${movie.title}" 
                                  loading="lazy"
                                  onerror="this.onerror=null;this.src='${fallbackUrl}';">
@@ -656,9 +720,14 @@ const FALLBACK_MOVIES = [
                     toggleSearch();
                 }
             });
-            console.log('%c🎬 CineVerse %cInicializado (Imágenes mejoradas)', 
-                'color: #e94560; font-size: 1.2rem;', 
-                `color: ${HAS_API_KEY ? '#00ff88' : '#ffd700'};`);
+            
+            if (HAS_API_KEY) {
+                console.log('%c🎬 CineVerse %cConectado a OMDb API', 
+                    'color: #e94560; font-size: 1.2rem;', 'color: #00ff88;');
+            } else {
+                console.log('%c🎬 CineVerse %cModo Simulado - Agrega tu API key de OMDb', 
+                    'color: #e94560; font-size: 1.2rem;', 'color: #ffd700;');
+            }
         });
     </script>
 </body>
