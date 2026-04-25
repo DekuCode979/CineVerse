@@ -387,36 +387,335 @@
             searchTimeout: null
         };
 
-        // ============================================
-        // DATOS DE RESPALDO (24 películas)
-        // ============================================
-        const FALLBACK_MOVIES = [
-            { id: 1, title: "Dune: Part Two", year: 2024, rating: 8.8, poster: "https://m.media-amazon.com/images/M/MV5BN2QyZGU4ZDctOWMzMy00NTc5LThlOGQtODhmNDI1NmY5YzAwXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_.jpg", synopsis: "Paul Atreides se une a los Fremen y comienza un viaje espiritual y marcial para convertirse en Muad'Dib.", genres: ["Sci-Fi", "Aventura", "Drama"] },
-            { id: 2, title: "Deadpool & Wolverine", year: 2024, rating: 8.2, poster: "https://m.media-amazon.com/images/M/MV5BZjI4ZWFhNDYtYzQ5Yi00ZmRiLWEyZGItM2I4MjJkYjYzMjE0XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Deadpool es sacado de su vida tranquila por la TVA y recluta a un Wolverine para salvar el multiverso.", genres: ["Acción", "Comedia"] },
-            { id: 3, title: "Inside Out 2", year: 2024, rating: 8.0, poster: "https://m.media-amazon.com/images/M/MV5BYTc1MDc3NzAtZDAyMC00MTE3LWI4MzUtODBhNTZlMmM5ZjE0XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Riley entra en la adolescencia y nuevas emociones como Ansiedad aparecen en el Cuartel General.", genres: ["Animación", "Aventura"] },
-            { id: 4, title: "The Wild Robot", year: 2024, rating: 8.4, poster: "https://m.media-amazon.com/images/M/MV5BZjM5M2FlNjQtNjY3Mi00MTRhLThhMDYtMDIyYmNjMDA2YWI3XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Un robot naufraga en una isla deshabitada y debe aprender a adaptarse al entorno salvaje.", genres: ["Animación", "Ciencia Ficción"] },
-            { id: 5, title: "Alien: Romulus", year: 2024, rating: 7.6, poster: "https://m.media-amazon.com/images/M/MV5BMDU0Njc5OGYtYmI4Yi00NmQ3LWI4YjctNDY5YjRlMDQ5ODI1XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Un grupo de jóvenes colonizadores espaciales se encuentra con la forma de vida más aterradora del universo.", genres: ["Horror", "Sci-Fi"] },
-            { id: 6, title: "Joker: Folie à Deux", year: 2024, rating: 6.8, poster: "https://m.media-amazon.com/images/M/MV5BYjU4YmM2YWUtZjFiZS00ZjUxLWEwMmMtMDYxMTJhMjZmZGRjXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Arthur Fleck está internado en Arkham a la espera de juicio por sus crímenes como Joker.", genres: ["Drama", "Musical"] },
-            { id: 7, title: "Wicked", year: 2024, rating: 7.9, poster: "https://m.media-amazon.com/images/M/MV5BZjM2NjE2YjUtNTZjZi00ZDk2LWJhZWUtNDE0MzY5NjJlZGExXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "La historia no contada de las brujas de Oz, Elphaba y Glinda, antes de Dorothy.", genres: ["Musical", "Fantasía"] },
-            { id: 8, title: "Moana 2", year: 2024, rating: 7.1, poster: "https://m.media-amazon.com/images/M/MV5BM2MxNzY3YzItM2VlNy00ZGRmLWExYzgtMTI5YzQwMmJhNjI0XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Moana recibe una llamada inesperada de sus antepasados y viaja a los mares lejanos de Oceanía.", genres: ["Animación", "Aventura"] },
-            { id: 9, title: "Oppenheimer", year: 2023, rating: 8.4, poster: "https://m.media-amazon.com/images/M/MV5BMDBmYTZjNjUtN2M1MS00MTQ2LTk2ODgtNzc2M2QyZGE5NTVjXkEyXkFqcGdeQXVyNzAwMjU2MTY@._V1_.jpg", synopsis: "La historia del científico J. Robert Oppenheimer y su papel en el desarrollo de la bomba atómica.", genres: ["Drama", "Historia"] },
-            { id: 10, title: "Barbie", year: 2023, rating: 7.1, poster: "https://m.media-amazon.com/images/M/MV5BNjU3N2QxNzYtMjk1NC00MTc4LTk1NTQtMmUxNTljM2I0NDA5XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_.jpg", synopsis: "Barbie y Ken se aventuran en el mundo real después de ser expulsados de Barbie Land.", genres: ["Comedia", "Aventura"] },
-            { id: 11, title: "The Batman", year: 2022, rating: 7.8, poster: "https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxZGEwXkEyXkFqcGdeQXVyMzMwOTU5MDk@._V1_.jpg", synopsis: "Batman investiga una serie de crímenes en Gotham City mientras enfrenta a El Acertijo.", genres: ["Acción", "Crimen"] },
-            { id: 12, title: "Interstellar", year: 2014, rating: 8.7, poster: "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg", synopsis: "Un grupo de exploradores viaja a través de un agujero de gusano para salvar a la humanidad.", genres: ["Sci-Fi", "Aventura"] },
-            { id: 13, title: "Furiosa: A Mad Max Saga", year: 2024, rating: 7.8, poster: "https://m.media-amazon.com/images/M/MV5BYjE0ZDVhMGQtMzgzNi00NjgyLWIyOTUtMjNjYmU1YzE2OTI0XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "La historia del origen de Furiosa antes de su encuentro con Mad Max.", genres: ["Acción", "Aventura"] },
-            { id: 14, title: "Gladiator II", year: 2024, rating: 7.3, poster: "https://m.media-amazon.com/images/M/MV5BMTk4NzgzNTIxNl5BMl5BanBnXkFtZTcwMDY4NjIzNQ@@._V1_.jpg", synopsis: "Años después de la muerte de Máximo, Lucius debe luchar en el Coliseo.", genres: ["Acción", "Drama"] },
-            { id: 15, title: "The Fall Guy", year: 2024, rating: 7.2, poster: "https://m.media-amazon.com/images/M/MV5BMjA2ZDcxZjEtMzUwOS00ODQyLTg0Y2MtNDA5YjJjZGM3N2M5XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Un doble de acción se ve envuelto en una conspiración mientras trabaja en una película.", genres: ["Acción", "Comedia"] },
-            { id: 16, title: "Ghostbusters: Frozen Empire", year: 2024, rating: 6.5, poster: "https://m.media-amazon.com/images/M/MV5BZjY0MmNjZDAtYjI4OS00Yzg4LThjM2EtMjA3MDRjMDg5NzA0XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Los Cazafantasmas deben salvar Nueva York de una nueva amenaza helada.", genres: ["Fantasía", "Comedia"] },
-            { id: 17, title: "Spider-Man: Across the Spider-Verse", year: 2023, rating: 8.7, poster: "https://m.media-amazon.com/images/M/MV5BMzI0NmVkMjEtYmY4MS00ZDMxLTlkZmEtMzU4MDQxYTMzMjU2XkEyXkFqcGdeQXVyMzQ0MzA0NTM@._V1_.jpg", synopsis: "Miles Morales viaja a través del multiverso donde conoce a un equipo de Spider-People.", genres: ["Animación", "Acción"] },
-            { id: 18, title: "Everything Everywhere All at Once", year: 2022, rating: 7.8, poster: "https://m.media-amazon.com/images/M/MV5BYTdiOTIyZTQtNmQ1OS00NjZlLWIyMTgtYzk5Y2M3ZDVmMDk1XkEyXkFqcGdeQXVyMTAzMDg4NzU0._V1_.jpg", synopsis: "Una inmigrante china se ve envuelta en una aventura salvaje para salvar el mundo.", genres: ["Acción", "Aventura"] },
-            { id: 19, title: "Parasite", year: 2019, rating: 8.5, poster: "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjRhMTUzYzVmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg", synopsis: "El desempleo lleva a la familia Park a tener una peculiar idea tras conocer a los ricos Kim.", genres: ["Drama", "Suspense"] },
-            { id: 20, title: "The Substance", year: 2024, rating: 7.5, poster: "https://m.media-amazon.com/images/M/MV5BZDQ1OGU5YTItMDljYi00OWE4LThkZTItMDc0MmYzMmI5YWUxXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Una actriz en decadencia prueba una droga del mercado negro que promete transformarla.", genres: ["Horror", "Drama"] },
-            { id: 21, title: "Heretic", year: 2024, rating: 7.1, poster: "https://m.media-amazon.com/images/M/MV5BY2YzMjc4YzgtNjRhYy00MmI5LWIwYzQtNTM3NTI3MjI0NmMzXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Dos misioneras mormonas llaman a la puerta de un hombre que las pondrá a prueba.", genres: ["Horror", "Suspense"] },
-            { id: 22, title: "The Brutalist", year: 2024, rating: 8.0, poster: "https://m.media-amazon.com/images/M/MV5BYjQzMjM4ZGItMjg4Yi00YzgzLWIxMmYtMTRjNzkyYjM4NDA5XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Un arquitecto judío húngaro emigra a Estados Unidos tras la Segunda Guerra Mundial.", genres: ["Drama", "Historia"] },
-            { id: 23, title: "Anora", year: 2024, rating: 8.1, poster: "https://m.media-amazon.com/images/M/MV5BYmI5MmFlYzItNTEzZi00YjU4LWIxOWMtOGQ4MjQxMjRmOWZhXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Una trabajadora sexual de Brooklyn se casa impulsivamente con el hijo de un oligarca ruso.", genres: ["Drama", "Comedia"] },
-            { id: 24, title: "Challengers", year: 2024, rating: 7.4, poster: "https://m.media-amazon.com/images/M/MV5BMzRhMzg1Y2MtMWU1My00NDdkLWI4ZGUtMjJjMmY2MjEyZWI5XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", synopsis: "Un triángulo amoroso entre tres tenistas profesionales se desarrolla dentro y fuera de la cancha.", genres: ["Drama", "Romance"] }
-        ];
-
+const FALLBACK_MOVIES = [
+    // ============================================
+    // ESTRENOS Y PELÍCULAS DE DATOS (2024-2025)
+    // ============================================
+    { 
+        id: 1, 
+        title: "Dune: Part Two", 
+        year: 2024, 
+        rating: 8.8, 
+        poster: "https://m.media-amazon.com/images/M/MV5BN2QyZGU4ZDctOWMzMy00NTc5LThlOGQtODhmNDI1NmY5YzAwXkEyXkFqcGdeQXVyMDM2NDM2MQ@@._V1_.jpg", 
+        synopsis: "Paul Atreides se une a los Fremen y comienza un viaje espiritual y marcial para convertirse en Muad'Dib, mientras una guerra santa se extiende por el universo.", 
+        genres: ["Sci-Fi", "Aventura", "Drama"] 
+    },
+    { 
+        id: 2, 
+        title: "Deadpool & Wolverine", 
+        year: 2024, 
+        rating: 8.0, 
+        poster: "https://m.media-amazon.com/images/M/MV5BZjI4ZWFhNDYtYzQ5Yi00ZmRiLWEyZGItM2I4MjJkYjYzMjE0XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Deadpool es sacado de su vida tranquila por la TVA y recluta a un Wolverine de otro universo para salvar el multiverso de una amenaza existencial.", 
+        genres: ["Acción", "Comedia", "Superhéroes"] 
+    },
+    { 
+        id: 3, 
+        title: "Inside Out 2", 
+        year: 2024, 
+        rating: 7.8, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYTc1MDc3NzAtZDAyMC00MTE3LWI4MzUtODBhNTZlMmM5ZjE0XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Riley entra en la adolescencia y el Cuartel General sufre una demolición para hacer espacio a nuevas emociones. Ansiedad, Envidia, Vergüenza y Ennui llegan para desafiar a Alegría.", 
+        genres: ["Animación", "Aventura", "Comedia"] 
+    },
+    { 
+        id: 4, 
+        title: "The Wild Robot", 
+        year: 2024, 
+        rating: 8.4, 
+        poster: "https://m.media-amazon.com/images/M/MV5BZjM5M2FlNjQtNjY3Mi00MTRhLThhMDYtMDIyYmNjMDA2YWI3XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Un robot naufraga en una isla deshabitada y debe aprender a adaptarse al entorno salvaje, formando vínculos inesperados con los animales nativos.", 
+        genres: ["Animación", "Ciencia Ficción", "Aventura"] 
+    },
+    { 
+        id: 5, 
+        title: "Alien: Romulus", 
+        year: 2024, 
+        rating: 7.6, 
+        poster: "https://m.media-amazon.com/images/M/MV5BMDU0Njc5OGYtYmI4Yi00NmQ3LWI4YjctNDY5YjRlMDQ5ODI1XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Un grupo de jóvenes colonizadores espaciales que buscan un nuevo hogar se encuentran con la forma de vida más aterradora del universo en una estación espacial abandonada.", 
+        genres: ["Horror", "Sci-Fi", "Suspense"] 
+    },
+    { 
+        id: 6, 
+        title: "Joker: Folie à Deux", 
+        year: 2024, 
+        rating: 6.6, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYjU4YmM2YWUtZjFiZS00ZjUxLWEwMmMtMDYxMTJhMjZmZGRjXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Arthur Fleck está internado en Arkham a la espera de juicio por sus crímenes como Joker. Allí encuentra el amor verdadero y descubre la música que siempre ha estado dentro de él.", 
+        genres: ["Drama", "Musical", "Thriller"] 
+    },
+    { 
+        id: 7, 
+        title: "Wicked", 
+        year: 2024, 
+        rating: 7.9, 
+        poster: "https://m.media-amazon.com/images/M/MV5BZjM2NjE2YjUtNTZjZi00ZDk2LWJhZWUtNDE0MzY5NjJlZGExXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "La historia no contada de las brujas de Oz. Elphaba, una joven incomprendida por su piel verde, y Glinda, una joven privilegiada, forjan una amistad que cambiará el mundo de Oz.", 
+        genres: ["Musical", "Fantasía", "Drama"] 
+    },
+    { 
+        id: 8, 
+        title: "Moana 2", 
+        year: 2024, 
+        rating: 7.1, 
+        poster: "https://m.media-amazon.com/images/M/MV5BM2MxNzY3YzItM2VlNy00ZGRmLWExYzgtMTI5YzQwMmJhNjI0XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Moana recibe una llamada inesperada de sus antepasados y viaja a los mares lejanos de Oceanía, adentrándose en aguas peligrosas para vivir una aventura sin precedentes.", 
+        genres: ["Animación", "Aventura", "Musical"] 
+    },
+    { 
+        id: 9, 
+        title: "Furiosa: A Mad Max Saga", 
+        year: 2024, 
+        rating: 7.8, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYjE0ZDVhMGQtMzgzNi00NjgyLWIyOTUtMjNjYmU1YzE2OTI0XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "La historia del origen de Furiosa antes de su encuentro y alianza con Mad Max. Secuestrada de su hogar, Furiosa debe sobrevivir a innumerables pruebas mientras busca el camino de regreso.", 
+        genres: ["Acción", "Aventura", "Sci-Fi"] 
+    },
+    { 
+        id: 10, 
+        title: "Gladiator II", 
+        year: 2024, 
+        rating: 7.3, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYjIxYjA0OGUtYzg3OS00NTJmLThiZWItZjc4MmE0MmE3ODI1XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Años después de la muerte de Máximo, Lucius debe luchar en el Coliseo después de que los emperadores conquistan su hogar. Con la ayuda de un misterioso gladiador, buscará venganza.", 
+        genres: ["Acción", "Drama", "Historia"] 
+    },
+    { 
+        id: 11, 
+        title: "The Fall Guy", 
+        year: 2024, 
+        rating: 7.2, 
+        poster: "https://m.media-amazon.com/images/M/MV5BMjA2ZDcxZjEtMzUwOS00ODQyLTg0Y2MtNDA5YjJjZGM3N2M5XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Un doble de acción retirado se ve envuelto en una peligrosa conspiración mientras trabaja en la última película de su ex novia. Deberá usar todas sus habilidades para sobrevivir.", 
+        genres: ["Acción", "Comedia", "Romance"] 
+    },
+    { 
+        id: 12, 
+        title: "Beetlejuice Beetlejuice", 
+        year: 2024, 
+        rating: 7.0, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYjIwOTk3MTktZjA3Mi00NWE4LWI0NTUtYmI4Yzg5MjViOTU2XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Tras una tragedia familiar, tres generaciones de la familia Deetz regresan a Winter River. La vida de Lydia da un vuelco cuando su hija descubre el portal al Más Allá.", 
+        genres: ["Comedia", "Fantasía", "Terror"] 
+    },
+    { 
+        id: 13, 
+        title: "A Quiet Place: Day One", 
+        year: 2024, 
+        rating: 6.9, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYmUxZmI1YzgtYzM5Yi00YzRlLWE5ZDgtMjI0Njg2YmRiNjI5XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Descubre cómo empezó todo. Una mujer debe sobrevivir el primer día de la invasión alienígena en la ciudad más ruidosa del mundo: Nueva York.", 
+        genres: ["Horror", "Sci-Fi", "Suspense"] 
+    },
+    { 
+        id: 14, 
+        title: "Kingdom of the Planet of the Apes", 
+        year: 2024, 
+        rating: 7.3, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYjE3ZmI4YzAtYjI0Yy00ZDJkLWI4YjAtMjJhMmQ3NGJiNjM4XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Ambientada 300 años después de la muerte de César, un nuevo líder simio construye su imperio mientras un joven simio descubre una verdad que cambiará el futuro de ambas especies.", 
+        genres: ["Acción", "Aventura", "Sci-Fi"] 
+    },
+    { 
+        id: 15, 
+        title: "Mickey 17", 
+        year: 2025, 
+        rating: 7.5, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYWY5N2Q2NjYtZGU3OS00N2MwLWE2YTktNGJhZmJiZDNhY2E2XkEyXkFqcGc@._V1_.jpg", 
+        synopsis: "Un empleado desechable es enviado a colonizar un planeta helado. Cada vez que muere, un nuevo clon ocupa su lugar con la mayoría de sus recuerdos intactos.", 
+        genres: ["Sci-Fi", "Drama", "Aventura"] 
+    },
+    { 
+        id: 16, 
+        title: "Snow White and the Seven Dwarfs", 
+        year: 2025, 
+        rating: 6.8, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYzUyYTQ4YzAtODJmYS00MTgyLThhYjQtZjViYzVmOTFmMzNhXkEyXkFqcGc@._V1_.jpg", 
+        synopsis: "Una princesa es desterrada al bosque por su malvada madrastra, donde encuentra refugio con siete enanitos. Live-action del clásico animado de Disney.", 
+        genres: ["Fantasía", "Musical", "Aventura"] 
+    },
+    { 
+        id: 17, 
+        title: "The Substance", 
+        year: 2024, 
+        rating: 7.5, 
+        poster: "https://m.media-amazon.com/images/M/MV5BZDQ1OGU5YTItMDljYi00OWE4LThkZTItMDc0MmYzMmI5YWUxXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Una actriz en decadencia prueba una droga del mercado negro que promete transformarla en una versión más joven y mejorada de sí misma, con consecuencias aterradoras.", 
+        genres: ["Horror", "Drama", "Thriller"] 
+    },
+    { 
+        id: 18, 
+        title: "Heretic", 
+        year: 2024, 
+        rating: 7.1, 
+        poster: "https://m.media-amazon.com/images/M/MV5BY2YzMjc4YzgtNjRhYy00MmI5LWIwYzQtNTM3NTI3MjI0NmMzXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Dos misioneras mormonas llaman a la puerta equivocada. El hombre que las recibe las pondrá a prueba en un juego mortal de fe y supervivencia.", 
+        genres: ["Horror", "Suspense", "Thriller"] 
+    },
+    { 
+        id: 19, 
+        title: "The Brutalist", 
+        year: 2024, 
+        rating: 8.0, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYjQzMjM4ZGItMjg4Yi00YzgzLWIxMmYtMTRjNzkyYjM4NDA5XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Un arquitecto judío húngaro emigra a Estados Unidos tras la Segunda Guerra Mundial para reconstruir su vida, su carrera y su matrimonio en un país lleno de promesas.", 
+        genres: ["Drama", "Historia"] 
+    },
+    { 
+        id: 20, 
+        title: "Anora", 
+        year: 2024, 
+        rating: 8.1, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYmI5MmFlYzItNTEzZi00YjU4LWIxOWMtOGQ4MjQxMjRmOWZhXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Una trabajadora sexual de Brooklyn se casa impulsivamente con el hijo de un oligarca ruso. Cuando la noticia llega a Rusia, su cuento de hadas se ve amenazado.", 
+        genres: ["Drama", "Comedia", "Romance"] 
+    },
+    { 
+        id: 21, 
+        title: "Challengers", 
+        year: 2024, 
+        rating: 7.4, 
+        poster: "https://m.media-amazon.com/images/M/MV5BMzRhMzg1Y2MtMWU1My00NDdkLWI4ZGUtMjJjMmY2MjEyZWI5XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Un triángulo amoroso entre tres tenistas profesionales que se desarrolla dentro y fuera de la cancha a lo largo de los años, culminando en un partido decisivo.", 
+        genres: ["Drama", "Romance", "Deporte"] 
+    },
+    { 
+        id: 22, 
+        title: "Oppenheimer", 
+        year: 2023, 
+        rating: 8.4, 
+        poster: "https://m.media-amazon.com/images/M/MV5BMDBmYTZjNjUtN2M1MS00MTQ2LTk2ODgtNzc2M2QyZGE5NTVjXkEyXkFqcGdeQXVyNzAwMjU2MTY@._V1_.jpg", 
+        synopsis: "La historia del científico J. Robert Oppenheimer y su papel en el desarrollo de la bomba atómica durante la Segunda Guerra Mundial. Ganadora de 7 premios Oscar.", 
+        genres: ["Drama", "Historia", "Biografía"] 
+    },
+    { 
+        id: 23, 
+        title: "Barbie", 
+        year: 2023, 
+        rating: 7.1, 
+        poster: "https://m.media-amazon.com/images/M/MV5BNjU3N2QxNzYtMjk1NC00MTc4LTk1NTQtMmUxNTljM2I0NDA5XkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_.jpg", 
+        synopsis: "Barbie y Ken se aventuran en el mundo real después de ser expulsados de Barbie Land. Una reflexión sobre la identidad, el patriarcado y el empoderamiento.", 
+        genres: ["Comedia", "Aventura", "Fantasía"] 
+    },
+    { 
+        id: 24, 
+        title: "Spider-Man: Across the Spider-Verse", 
+        year: 2023, 
+        rating: 8.7, 
+        poster: "https://m.media-amazon.com/images/M/MV5BMzI0NmVkMjEtYmY4MS00ZDMxLTlkZmEtMzU4MDQxYTMzMjU2XkEyXkFqcGdeQXVyMzQ0MzA0NTM@._V1_.jpg", 
+        synopsis: "Miles Morales viaja a través del multiverso donde conoce a un equipo de Spider-People encargados de proteger su existencia. Pero surge un nuevo enemigo.", 
+        genres: ["Animación", "Acción", "Aventura"] 
+    },
+    { 
+        id: 25, 
+        title: "The Batman", 
+        year: 2022, 
+        rating: 7.8, 
+        poster: "https://m.media-amazon.com/images/M/MV5BMDdmMTBiNTYtMDIzNi00NGVlLWIzMDYtZTk3MTQ3NGQxZGEwXkEyXkFqcGdeQXVyMzMwOTU5MDk@._V1_.jpg", 
+        synopsis: "En su segundo año como vigilante, Batman investiga una serie de crímenes en Gotham City mientras enfrenta a El Acertijo, un asesino en serie que apunta a la élite.", 
+        genres: ["Acción", "Crimen", "Drama"] 
+    },
+    { 
+        id: 26, 
+        title: "Everything Everywhere All at Once", 
+        year: 2022, 
+        rating: 7.8, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYTdiOTIyZTQtNmQ1OS00NjZlLWIyMTgtYzk5Y2M3ZDVmMDk1XkEyXkFqcGdeQXVyMTAzMDg4NzU0._V1_.jpg", 
+        synopsis: "Una inmigrante china se ve envuelta en una aventura salvaje donde ella sola puede salvar el mundo explorando otros universos. Ganadora de 7 premios Oscar.", 
+        genres: ["Acción", "Aventura", "Comedia"] 
+    },
+    { 
+        id: 27, 
+        title: "Interstellar", 
+        year: 2014, 
+        rating: 8.7, 
+        poster: "https://m.media-amazon.com/images/M/MV5BZjdkOTU3MDktN2IxOS00OGEyLWFmMjktY2FiMmZkNWIyODZiXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg", 
+        synopsis: "Un grupo de exploradores viaja a través de un agujero de gusano en el espacio para encontrar un nuevo hogar para la humanidad, que se enfrenta a la extinción en la Tierra.", 
+        genres: ["Sci-Fi", "Aventura", "Drama"] 
+    },
+    { 
+        id: 28, 
+        title: "Parasite", 
+        year: 2019, 
+        rating: 8.5, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYWZjMjk3ZTItODQ2ZC00NTY5LWE0ZDYtZTI3MjRhMTUzYzVmXkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_.jpg", 
+        synopsis: "El desempleo lleva a la familia Park a tener una peculiar idea tras conocer a los ricos Kim. Una obra maestra sobre la lucha de clases. Ganadora del Oscar a Mejor Película.", 
+        genres: ["Drama", "Suspense", "Thriller"] 
+    },
+    { 
+        id: 29, 
+        title: "The Super Mario Bros. Movie", 
+        year: 2023, 
+        rating: 7.1, 
+        poster: "https://m.media-amazon.com/images/M/MV5BOTJhNzlmNzctNTU3Yy00ZjNkLWI0OGYtMjA0MzJkYjE5NjZjXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Mario y Luigi son transportados a un mundo mágico donde deben unirse a la Princesa Peach para detener al malvado Bowser y salvar el Reino Champiñón.", 
+        genres: ["Animación", "Aventura", "Comedia"] 
+    },
+    { 
+        id: 30, 
+        title: "Avatar: The Way of Water", 
+        year: 2022, 
+        rating: 7.6, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYjhiNjBlODctY2ZiOC00YjVlLWFlNzAtNTVhNzM1YjI1NzMxXkEyXkFqcGdeQXVyMjQxNTE1MDA@._V1_.jpg", 
+        synopsis: "Jake Sully y Ney'tiri han formado una familia y hacen todo lo posible por permanecer juntos. Sin embargo, deben abandonar su hogar y explorar las regiones de Pandora.", 
+        genres: ["Sci-Fi", "Aventura", "Acción"] 
+    },
+    { 
+        id: 31, 
+        title: "Civil War", 
+        year: 2024, 
+        rating: 7.2, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYTkzNjI3MTMtNzU1Yi00YTE0LWIyZDgtYjUxZWIwMmQ0OGQ4XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "En un futuro cercano, un equipo de periodistas viaja a través de Estados Unidos durante una guerra civil que se intensifica rápidamente y que involucra a toda la nación.", 
+        genres: ["Acción", "Drama", "Thriller"] 
+    },
+    { 
+        id: 32, 
+        title: "Twisters", 
+        year: 2024, 
+        rating: 6.8, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYjc5YzNlYmEtYzI5Ny00ZDg4LWIwZGMtNjIzMjY4MjEwNzg4XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Una nueva generación de cazadores de tormentas se adentra en el corazón de tornados cada vez más intensos y frecuentes en Oklahoma.", 
+        genres: ["Acción", "Aventura", "Thriller"] 
+    },
+    { 
+        id: 33, 
+        title: "IF", 
+        year: 2024, 
+        rating: 6.5, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYWQzNzI5NzktMDNiYi00Y2U3LThjY2MtNjY0MzA4ZGY4MzM5XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Una niña descubre que puede ver a los amigos imaginarios de todos, y emprende una aventura para reconectar a los IFs olvidados con sus niños.", 
+        genres: ["Fantasía", "Comedia", "Familiar"] 
+    },
+    { 
+        id: 34, 
+        title: "Bad Boys: Ride or Die", 
+        year: 2024, 
+        rating: 7.0, 
+        poster: "https://m.media-amazon.com/images/M/MV5BZjMxY2I0YzAtYjA2NC00MWU4LWJkOGItOGY5NTc1NTI0ODM4XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Mike y Marcus deben limpiar el nombre de su difunto capitán, que ha sido falsamente vinculado a un cartel de la droga.", 
+        genres: ["Acción", "Comedia", "Crimen"] 
+    },
+    { 
+        id: 35, 
+        title: "Sonic the Hedgehog 3", 
+        year: 2024, 
+        rating: 7.3, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYTE1MDk3MmItYTAzYi00YjQ2LTg4NjUtOWI5NjJmMjM3ZWE4XkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "Sonic, Tails y Knuckles deben enfrentarse a un nuevo y poderoso enemigo: Shadow the Hedgehog. Para detenerlo, deberán formar una alianza inesperada.", 
+        genres: ["Acción", "Aventura", "Comedia"] 
+    },
+    { 
+        id: 36, 
+        title: "Transformers One", 
+        year: 2024, 
+        rating: 7.6, 
+        poster: "https://m.media-amazon.com/images/M/MV5BYWMxNTFiMjgtMjBhMi00Nzg0LThmNGItYzQ5YzBjNDI1NmFjXkEyXkFqcGdeQXVyMTUzMTg2ODkz._V1_.jpg", 
+        synopsis: "La historia jamás contada del origen de Optimus Prime y Megatron, amigos inseparables que cambiaron el destino de Cybertron para siempre.", 
+        genres: ["Animación", "Acción", "Aventura"] 
+    }
+];
         // ============================================
         // FUNCIÓN DE FALLBACK DE IMÁGENES MEJORADA
         // ============================================
