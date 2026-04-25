@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎬 CineVerse - Películas Populares</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-primary: #0f0f1a;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --bg-card-hover: #1a2744;
+            --text-primary: #e8e8f0;
+            --text-secondary: #a0a0b8;
+            --accent: #e94560;
+            --accent-hover: #ff6b81;
+            --star: #ffd700;
+            --border: rgba(233, 69, 96, 0.2);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            --card-radius: 16px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--bg-primary);
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(233, 69, 96, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(233, 69, 96, 0.03) 0%, transparent 50%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .navbar-custom {
+            background: rgba(22, 33, 62, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+            padding: 1rem 0;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #e94560, #ff6b81);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .search-container { position: relative; }
+        
+        .search-box {
+            position: relative;
+            width: 0;
+            overflow: hidden;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: var(--bg-secondary);
+            border-radius: 25px;
+            border: 1px solid var(--border);
+        }
+        
+        .search-box.active { width: 300px; }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.6rem 2.5rem 0.6rem 1.2rem;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+        }
+        
+        .search-box input::placeholder { color: var(--text-secondary); }
+        
+        .search-toggle {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: all 0.3s;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+        }
+        
+        .search-toggle:hover {
+            background: rgba(233, 69, 96, 0.2);
+            color: var(--accent);
+        }
+        
+        .search-close {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: none;
+        }
+        
+        .search-box.active .search-close { display: block; }
+
+        .hero-section { padding: 3rem 0 2rem; text-align: center; }
+        
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #e94560, #ff6b81, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle { color: var(--text-secondary); font-size: 1.1rem; }
+        
+        .stats-badge {
+            display: inline-block;
+            background: rgba(233, 69, 96, 0.15);
+            border: 1px solid var(--border);
+            padding: 0.4rem 1.2rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .movie-card {
+            background: var(--bg-card);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: var(--shadow);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .movie-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px rgba(233, 69, 96, 0.2);
+            border-color: var(--border);
+            background: var(--bg-card-hover);
+        }
+        
+        .movie-poster {
+            position: relative;
+            overflow: hidden;
+            aspect-ratio: 2/3;
+            background: var(--bg-secondary);
+        }
+        
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .movie-card:hover .movie-poster img { transform: scale(1.05); }
+        
+        .movie-rating {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            color: var(--star);
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .movie-poster-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1rem;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .movie-card:hover .movie-poster-overlay { opacity: 1; }
+        
+        .movie-year { color: white; font-size: 0.85rem; }
+        
+        .movie-body {
+            padding: 1.2rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+.movie-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    line-height: 1.3;
+    
+    /* Truncar a 2 líneas */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;                    
+    overflow: hidden;
+    text-overflow: ellipsis;          
+}
+
+.movie-synopsis {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    flex: 1;
+    
+    /* Truncar a 3 líneas */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;                    
+    overflow: hidden;
+    text-overflow: ellipsis;          
+    margin-bottom: 0.8rem;
+}
+        
+        .movie-genres {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: auto;
+        }
+        
+        .genre-badge {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            background: rgba(233, 69, 96, 0.1);
+            color: var(--accent);
+            border: 1px solid var(--border);
+        }
+
+        .pagination-custom .page-link {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 0.6rem 1rem;
+            transition: all 0.3s;
+            border-radius: 8px;
+            margin: 0 0.2rem;
+        }
+        
+        .pagination-custom .page-link:hover {
+            background: rgba(233, 69, 96, 0.2);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        
+        .pagination-custom .page-item.active .page-link {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            font-weight: 700;
+        }
+        
+        .pagination-custom .page-item.disabled .page-link {
+            background: rgba(22, 33, 62, 0.5);
+            border-color: transparent;
+            color: var(--text-secondary);
+        }
+
+        .skeleton-card {
+            background: var(--bg-card);
+            border-radius: var(--card-radius);
+            overflow: hidden;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .skeleton-poster {
+            aspect-ratio: 2/3;
+            background: var(--bg-secondary);
+        }
+        
+        .skeleton-body { padding: 1.2rem; }
+        
+        .skeleton-line {
+            height: 14px;
+            background: var(--bg-secondary);
+            border-radius: 4px;
+            margin-bottom: 8px;
+        }
+        
+        .skeleton-line.short { width: 60%; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        
+        .error-state {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(233, 69, 96, 0.1);
+            border-radius: 16px;
+            border: 1px solid var(--accent);
+        }
+
+        .mode-indicator {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 10px;
+            margin-left: 0.5rem;
+        }
+        
+        .mode-live {
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+        
+        .mode-simulated {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            border: 1px solid #ffd700;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title { font-size: 1.8rem; }
+            .search-box.active { width: 200px; }
+            .navbar-brand { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar-custom sticky-top">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-film"></i> CineVerse
+                    <span class="mode-indicator" id="modeIndicator">Cargando...</span>
+                </a>
+                
+                <div class="d-flex align-items-center gap-3">
+                    <div class="search-container d-flex align-items-center">
+                        <div class="search-box" id="searchBox">
+                            <input type="text" 
+                                   id="searchInput" 
+                                   placeholder="Buscar películas..." 
+                                   onkeyup="handleSearch(this.value)">
+                            <button class="search-close" onclick="toggleSearch()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <button class="search-toggle" onclick="toggleSearch()" id="searchToggle">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">🎬 Películas Populares</h1>
+            <p class="hero-subtitle">Descubre las mejores películas del momento</p>
+            <span class="stats-badge" id="statsBadge">
+                <i class="fas fa-fire"></i> Cargando...
+            </span>
+        </div>
+    </section>
+
+    <!-- Movies Grid -->
+    <section class="movies-container">
+        <div class="container">
+            <!-- Skeleton Loading -->
+            <div class="row g-4" id="loadingGrid"></div>
+            
+            <!-- Movies Grid -->
+            <div class="row g-4" id="moviesGrid" style="display: none;"></div>
+            
+            <!-- Empty State -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <i class="fas fa-film"></i>
+                <h3>No se encontraron películas</h3>
+                <p>Intenta con otra búsqueda</p>
+            </div>
+            
+            <!-- Error State -->
+            <div class="error-state" id="errorState" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>Error al cargar películas</h3>
+                <p id="errorMessage">Por favor, intenta de nuevo más tarde</p>
+                <button class="btn btn-outline-light mt-3" onclick="loadMovies()">
+                    <i class="fas fa-redo"></i> Reintentar
+                </button>
+            </div>
+            
+            <!-- Pagination -->
+            <nav class="mt-5" id="paginationNav" style="display: none;">
+                <ul class="pagination pagination-custom justify-content-center" id="pagination"></ul>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Config local (SOLO existe en tu computadora) -->
+    <script src="js/config.js"></script>
+    
+    <script>
+        // ============================================
+        // DETECCIÓN AUTOMÁTICA DE API KEY
+        // ============================================
+        
+        // Si el archivo config.js no existe (GitHub Pages), WATCHMODE_API_KEY será undefined
+        const HAS_API_KEY = typeof WATCHMODE_API_KEY !== 'undefined' && 
+                           WATCHMODE_API_KEY !== 'TU_API_KEY_REAL_AQUI';
+        
+        // Mostrar modo actual
+        const modeIndicator = document.getElementById('modeIndicator');
+        if (HAS_API_KEY) {
+            modeIndicator.textContent = '🔴 LIVE';
+            modeIndicator.className = 'mode-indicator mode-live';
+            console.log('%c✅ Modo LIVE: Usando Watchmode API', 'color: #00ff88;');
+        } else {
+            modeIndicator.textContent = '🟡 SIMULADO';
+            modeIndicator.className = 'mode-indicator mode-simulated';
+            console.log('%c⚠️ Modo SIMULADO: Datos de ejemplo (sin API Key)', 'color: #ffd700;');
+        }
+
+        // ============================================
+        // CONFIGURACIÓN
+        // ============================================
+        
+        const CONFIG = {
+            moviesPerPage: 12,
+            currentPage: 1,
+            totalPages: 1,
+            totalResults: 0,
+            currentQuery: '',
+            searchTimeout: null
+        };
+
+        // ============================================
+        // DATOS DE RESPALDO (24 películas)
+        // ============================================
+        
+        const FALLBACK_MOVIES = [
+            { id: 1, title: "Dune: Part Two", year: 2024, rating: 8.8, poster: "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg", synopsis: "Paul Atreides se une a los Fremen y comienza un viaje espiritual y marcial para convertirse en Muad'Dib.", genres: ["Sci-Fi", "Aventura", "Drama"] },
+            { id: 2, title: "Deadpool & Wolverine", year: 2024, rating: 8.2, poster: "https://image.tmdb.org/t/p/w500/4JeejGugONWpJkbnvLrK2NkMZcB.jpg", synopsis: "Deadpool es sacado de su vida tranquila por la TVA y recluta a un Wolverine para salvar el multiverso.", genres: ["Acción", "Comedia"] },
+            { id: 3, title: "Inside Out 2", year: 2024, rating: 8.0, poster: "https://image.tmdb.org/t/p/w500/vpnVM9B6NMmQpWeZvzLvDESb2QY.jpg", synopsis: "Riley entra en la adolescencia y nuevas emociones como Ansiedad aparecen en el Cuartel General.", genres: ["Animación", "Aventura"] },
+            { id: 4, title: "The Wild Robot", year: 2024, rating: 8.4, poster: "https://image.tmdb.org/t/p/w500/wTnV3PCVW5O92JMrFvvrXcV9OXo.jpg", synopsis: "Un robot naufraga en una isla deshabitada y debe aprender a adaptarse al entorno salvaje.", genres: ["Animación", "Ciencia Ficción"] },
+            { id: 5, title: "Alien: Romulus", year: 2024, rating: 7.6, poster: "https://image.tmdb.org/t/p/w500/b33nnKl1GSFbao4l3fZDFqsMux1.jpg", synopsis: "Un grupo de jóvenes colonizadores espaciales se encuentra con la forma de vida más aterradora del universo.", genres: ["Horror", "Sci-Fi"] },
+            { id: 6, title: "Joker: Folie à Deux", year: 2024, rating: 6.8, poster: "https://image.tmdb.org/t/p/w500/if8QiqCI7hy7M2SY5YXGDjeK1i0.jpg", synopsis: "Arthur Fleck está internado en Arkham a la espera de juicio por sus crímenes como Joker.", genres: ["Drama", "Musical"] },
+            { id: 7, title: "Wicked", year: 2024, rating: 7.9, poster: "https://image.tmdb.org/t/p/w500/xDGbZ0JJ3mYaGKy4Nzd9Kph6M9L.jpg", synopsis: "La historia no contada de las brujas de Oz, Elphaba y Glinda, antes de Dorothy.", genres: ["Musical", "Fantasía"] },
+            { id: 8, title: "Moana 2", year: 2024, rating: 7.1, poster: "https://image.tmdb.org/t/p/w500/a0eIyL7NeLh7hFfZ8Iq8QbIy0Cb.jpg", synopsis: "Moana recibe una llamada inesperada de sus antepasados y viaja a los mares lejanos de Oceanía.", genres: ["Animación", "Aventura"] },
+            { id: 9, title: "Oppenheimer", year: 2023, rating: 8.4, poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg", synopsis: "La historia del científico J. Robert Oppenheimer y su papel en el desarrollo de la bomba atómica.", genres: ["Drama", "Historia"] },
+            { id: 10, title: "Barbie", year: 2023, rating: 7.1, poster: "https://image.tmdb.org/t/p/w500/iuFNMS8U5cb6xfzi51Dbkovj7vM.jpg", synopsis: "Barbie y Ken se aventuran en el mundo real después de ser expulsados de Barbie Land.", genres: ["Comedia", "Aventura"] },
+            { id: 11, title: "The Batman", year: 2022, rating: 7.8, poster: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg", synopsis: "Batman investiga una serie de crímenes en Gotham City mientras enfrenta a El Acertijo.", genres: ["Acción", "Crimen"] },
+            { id: 12, title: "Interstellar", year: 2014, rating: 8.7, poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg", synopsis: "Un grupo de exploradores viaja a través de un agujero de gusano para salvar a la humanidad.", genres: ["Sci-Fi", "Aventura"] },
+            { id: 13, title: "Furiosa: A Mad Max Saga", year: 2024, rating: 7.8, poster: "https://image.tmdb.org/t/p/w500/iADOJ8Zymht2JPMoy3R7xceZpr3.jpg", synopsis: "La historia del origen de Furiosa antes de su encuentro con Mad Max.", genres: ["Acción", "Aventura"] },
+            { id: 14, title: "Gladiator II", year: 2024, rating: 7.3, poster: "https://image.tmdb.org/t/p/w500/2cxhv0moE7LHH4xH0dRl7B9QMEX.jpg", synopsis: "Años después de la muerte de Máximo, Lucius debe luchar en el Coliseo.", genres: ["Acción", "Drama"] },
+            { id: 15, title: "The Fall Guy", year: 2024, rating: 7.2, poster: "https://image.tmdb.org/t/p/w500/a2oUkUgMowYHD6J8JwJqMq3Ycnn.jpg", synopsis: "Un doble de acción se ve envuelto en una conspiración mientras trabaja en una película.", genres: ["Acción", "Comedia"] },
+            { id: 16, title: "Ghostbusters: Frozen Empire", year: 2024, rating: 6.5, poster: "https://image.tmdb.org/t/p/w500/7jYZ6LG3GKBw4GSZ6X7jA2kB2Yz.jpg", synopsis: "Los Cazafantasmas deben salvar Nueva York de una nueva amenaza helada.", genres: ["Fantasía", "Comedia"] },
+            { id: 17, title: "Spider-Man: Across the Spider-Verse", year: 2023, rating: 8.7, poster: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg", synopsis: "Miles Morales viaja a través del multiverso donde conoce a un equipo de Spider-People.", genres: ["Animación", "Acción"] },
+            { id: 18, title: "Everything Everywhere All at Once", year: 2022, rating: 7.8, poster: "https://image.tmdb.org/t/p/w500/w3LxiVYdWWRvEVdn5RYq6jIqkb1.jpg", synopsis: "Una inmigrante china se ve envuelta en una aventura salvaje para salvar el mundo.", genres: ["Acción", "Aventura"] },
+            { id: 19, title: "Parasite", year: 2019, rating: 8.5, poster: "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg", synopsis: "El desempleo lleva a la familia Park a tener una peculiar idea tras conocer a los ricos Kim.", genres: ["Drama", "Suspense"] },
+            { id: 20, title: "The Substance", year: 2024, rating: 7.5, poster: "https://image.tmdb.org/t/p/w500/lqoMzCcZYEFK729d6qzt9a2wEwB.jpg", synopsis: "Una actriz en decadencia prueba una droga del mercado negro que promete transformarla.", genres: ["Horror", "Drama"] },
+            { id: 21, title: "Heretic", year: 2024, rating: 7.1, poster: "https://image.tmdb.org/t/p/w500/5gTXUMGqV9Jgx0F9K6yHGQ4pCWw.jpg", synopsis: "Dos misioneras mormonas llaman a la puerta de un hombre que las pondrá a prueba.", genres: ["Horror", "Suspense"] },
+            { id: 22, title: "The Brutalist", year: 2024, rating: 8.0, poster: "https://image.tmdb.org/t/p/w500/3Nc3YqLfJ7hWg5FGMhGHhFBVxEN.jpg", synopsis: "Un arquitecto judío húngaro emigra a Estados Unidos tras la Segunda Guerra Mundial.", genres: ["Drama", "Historia"] },
+            { id: 23, title: "Anora", year: 2024, rating: 8.1, poster: "https://image.tmdb.org/t/p/w500/7MrPLrJFkxA0FFTtKPk5HeNtGIP.jpg", synopsis: "Una trabajadora sexual de Brooklyn se casa impulsivamente con el hijo de un oligarca ruso.", genres: ["Drama", "Comedia"] },
+            { id: 24, title: "Challengers", year: 2024, rating: 7.4, poster: "https://image.tmdb.org/t/p/w500/4i8K5ZvI0QzW6x3NH8URQF0bXBz.jpg", synopsis: "Un triángulo amoroso entre tres tenistas profesionales se desarrolla dentro y fuera de la cancha.", genres: ["Drama", "Romance"] }
+        ];
+
+        // ============================================
+        // FUNCIONES PRINCIPALES
+        // ============================================
+
+        async function fetchMovies(query = '', page = 1) {
+            // Si tenemos API Key, intentamos usarla
+            if (HAS_API_KEY) {
+                try {
+                    const baseUrl = 'https://api.watchmode.com/v1';
+                    let url;
+                    
+                    if (query) {
+                        url = `${baseUrl}/search/?apiKey=${WATCHMODE_API_KEY}&search_field=name&search_value=${encodeURIComponent(query)}&types=movie`;
+                    } else {
+                        const skip = (page - 1) * CONFIG.moviesPerPage;
+                        url = `${baseUrl}/list-titles/?apiKey=${WATCHMODE_API_KEY}&types=movie&limit=${CONFIG.moviesPerPage}&skip=${skip}`;
+                    }
+
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) throw new Error(`API error: ${response.status}`);
+                    
+                    const data = await response.json();
+                    
+                    const movies = (data.titles || []).map(movie => ({
+                        id: movie.id,
+                        title: movie.title,
+                        year: movie.year || new Date().getFullYear(),
+                        rating: (Math.random() * 3 + 5).toFixed(1),
+                        poster: movie.poster || `https://image.tmdb.org/t/p/w500/default.jpg`,
+                        synopsis: movie.plot_overview || 'Sinopsis no disponible',
+                        genres: movie.genre_names || ['General']
+                    }));
+
+                    return {
+                        movies: movies,
+                        totalResults: data.total_results || movies.length,
+                        totalPages: Math.ceil((data.total_results || movies.length) / CONFIG.moviesPerPage)
+                    };
+                    
+                } catch (error) {
+                    console.warn('Error con Watchmode API, usando datos de respaldo:', error.message);
+                }
+            }
+            
+            // Usar datos de respaldo
+            return getFallbackMovies(query, page);
+        }
+
+        function getFallbackMovies(query = '', page = 1) {
+            let filtered = FALLBACK_MOVIES;
+            
+            if (query) {
+                const term = query.toLowerCase();
+                filtered = FALLBACK_MOVIES.filter(movie => 
+                    movie.title.toLowerCase().includes(term) ||
+                    movie.synopsis.toLowerCase().includes(term) ||
+                    movie.genres.some(genre => genre.toLowerCase().includes(term))
+                );
+            }
+            
+            const totalResults = filtered.length;
+            const totalPages = Math.ceil(totalResults / CONFIG.moviesPerPage);
+            const start = (page - 1) * CONFIG.moviesPerPage;
+            
+            // Simular delay de red
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve({
+                        movies: filtered.slice(start, start + CONFIG.moviesPerPage),
+                        totalResults,
+                        totalPages
+                    });
+                }, 500);
+            });
+        }
+
+        function renderMovieCards(movies) {
+            const grid = document.getElementById('moviesGrid');
+            
+            if (!movies || movies.length === 0) {
+                grid.innerHTML = '';
+                document.getElementById('emptyState').style.display = 'block';
+                document.getElementById('paginationNav').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('emptyState').style.display = 'none';
+            
+            grid.innerHTML = movies.map(movie => `
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="movie-card">
+                        <div class="movie-poster">
+                            <img src="${movie.poster}" 
+                                 alt="${movie.title}" 
+                                 loading="lazy"
+                                 onerror="this.src='https://via.placeholder.com/300x450/16213e/e94560?text=🎬+Movie'">
+                            <div class="movie-rating">
+                                <i class="fas fa-star"></i> ${movie.rating}
+                            </div>
+                            <div class="movie-poster-overlay">
+                                <span class="movie-year">
+                                    <i class="far fa-calendar-alt"></i> ${movie.year}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="movie-body">
+                            <h5 class="movie-title" title="${movie.title}">${movie.title}</h5>
+                            <p class="movie-synopsis" title="${movie.synopsis}">${movie.synopsis}</p>
+                            <div class="movie-genres">
+                                ${movie.genres.slice(0, 3).map(genre => 
+                                    `<span class="genre-badge">${genre}</span>`
+                                ).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const nav = document.getElementById('paginationNav');
+            
+            if (CONFIG.totalPages <= 1) {
+                nav.style.display = 'none';
+                return;
+            }
+            
+            nav.style.display = 'block';
+            
+            let html = '';
+            
+            html += `
+                <li class="page-item ${CONFIG.currentPage === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${CONFIG.currentPage - 1})">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>`;
+            
+            for (let i = 1; i <= CONFIG.totalPages; i++) {
+                if (i === 1 || i === CONFIG.totalPages || 
+                    (i >= CONFIG.currentPage - 2 && i <= CONFIG.currentPage + 2)) {
+                    html += `
+                        <li class="page-item ${i === CONFIG.currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" onclick="changePage(${i})">${i}</a>
+                        </li>`;
+                } else if (i === CONFIG.currentPage - 3 || i === CONFIG.currentPage + 3) {
+                    html += '<li class="page-item disabled"><span class="page-link">...</span></li>';
+                }
+            }
+            
+            html += `
+                <li class="page-item ${CONFIG.currentPage === CONFIG.totalPages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" onclick="changePage(${CONFIG.currentPage + 1})">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>`;
+            
+            pagination.innerHTML = html;
+        }
+
+        function showLoading() {
+            const loadingGrid = document.getElementById('loadingGrid');
+            document.getElementById('moviesGrid').style.display = 'none';
+            document.getElementById('errorState').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+            loadingGrid.style.display = 'flex';
+            
+            let html = '';
+            for (let i = 0; i < CONFIG.moviesPerPage; i++) {
+                html += `
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <div class="skeleton-card">
+                            <div class="skeleton-poster"></div>
+                            <div class="skeleton-body">
+                                <div class="skeleton-line"></div>
+                                <div class="skeleton-line short"></div>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+            loadingGrid.innerHTML = html;
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingGrid').style.display = 'none';
+            document.getElementById('moviesGrid').style.display = 'flex';
+        }
+
+        function updateStats(total, query) {
+            const badge = document.getElementById('statsBadge');
+            badge.innerHTML = query 
+                ? `<i class="fas fa-search"></i> "${query}" - ${total} resultados`
+                : `<i class="fas fa-fire"></i> ${total} películas populares`;
+        }
+
+        async function loadMovies(query = '', page = 1) {
+            showLoading();
+            
+            try {
+                const data = await fetchMovies(query, page);
+                hideLoading();
+                renderMovieCards(data.movies);
+                
+                CONFIG.totalPages = data.totalPages;
+                CONFIG.totalResults = data.totalResults;
+                CONFIG.currentPage = page;
+                CONFIG.currentQuery = query;
+                
+                updateStats(data.totalResults, query);
+                renderPagination();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+            } catch (error) {
+                hideLoading();
+                document.getElementById('errorState').style.display = 'block';
+                document.getElementById('errorMessage').textContent = error.message;
+                document.getElementById('moviesGrid').style.display = 'none';
+                document.getElementById('loadingGrid').style.display = 'none';
+            }
+        }
+
+        function changePage(page) {
+            if (page < 1 || page > CONFIG.totalPages) return;
+            loadMovies(CONFIG.currentQuery, page);
+        }
+
+        function handleSearch(query) {
+            clearTimeout(CONFIG.searchTimeout);
+            CONFIG.searchTimeout = setTimeout(() => {
+                loadMovies(query.trim(), 1);
+            }, 500);
+        }
+
+        function toggleSearch() {
+            const searchBox = document.getElementById('searchBox');
+            searchBox.classList.toggle('active');
+            
+            if (searchBox.classList.contains('active')) {
+                document.getElementById('searchInput').focus();
+            } else {
+                document.getElementById('searchInput').value = '';
+                handleSearch('');
+            }
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMovies();
+            
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && document.getElementById('searchBox').classList.contains('active')) {
+                    toggleSearch();
+                }
+            });
+            
+            console.log('%c🎬 CineVerse %cInicializado', 
+                'color: #e94560; font-size: 1.5rem;', 
+                `color: ${HAS_API_KEY ? '#00ff88' : '#ffd700'};`);
+            console.log(`%cModo: ${HAS_API_KEY ? 'LIVE (Watchmode API)' : 'SIMULADO (Datos de ejemplo)'}`, 
+                `color: ${HAS_API_KEY ? '#00ff88' : '#ffd700'};`);
+        });
+    </script>
+</body>
+</html>
